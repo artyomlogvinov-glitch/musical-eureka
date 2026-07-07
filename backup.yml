@@ -54,7 +54,7 @@
         src: "{{ social_path }}\\Worker\\{{ item.source_file }}"
         dest: "{{ social_path }}\\_backup\\{{ backup_file }}\\Worker"
         remote_src: true
-        when: worker_path is directory
+        when: worker_path is exist
       loop:
         - { source_file: 'ijwhost.dll', backup_file: 'ijwhost.dll' }
         - { source_file: 'MT5APIManager64.dll', backup_file: 'MT5APIManager64.dll' }
