@@ -1,20 +1,17 @@
 ---
-- name: Create Remote Backup
+- name: Windows File/Directory Backup
   hosts: 65.108.76.197
-  become: yes
+  gather_facts: false
   vars:
-    backup_source: "C:\Brokeree\Brokeree.Social\API\SocialTrading.API.exe"
-    backup_dest: "C:\Brokeree\Brokeree.Social\_backup"
-  
+    backup_file: "{{ lookup('pipe','date +%Y-%m-%d') }}"
   tasks:
-    - name: Create backup directory if it does not exist
-      ansible.builtin.file:
-        path: "{{ backup_dest }}"
+    - name: Ensure target backup directory exists
+      ansible.windows.win_file:
+        path: C:\Brokeree\Brokeree.Social\_backup\{{ backup_file }}
         state: directory
-        mode: '0755'
 
-    - name: Create a timestamped archive
-      community.general.archive:
-        path: "{{ backup_source }}"
-        dest: "{{ backup_dest }}/backup-{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}.tar.gz"
-        format: gz
+    - name: Copy a single file where the source is on the remote host
+      ansible.windows.win_copy:
+        src: C:\Brokeree\Brokeree.Social\API\SocialTrading.API.exe
+        dest: C:\Brokeree\Brokeree.Social\{{ backup_file }}\SocialTrading.API.exe
+        remote_src: true
