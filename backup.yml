@@ -5,7 +5,7 @@
   vars:
     backup_file: "{{ lookup('pipe','date +%Y-%m-%d') }}"
   tasks:
-    - name: Create backup directory
+    - name: Create backup directories
       ansible.windows.win_file:
         path: C:\Brokeree\Brokeree.Social\_backup\{{ backup_file }}\{{ item.social_file }}
         state: directory
@@ -14,12 +14,13 @@
         - { social_file: "Ratings" }
         - { social_file: "Worker" }
 
-    - name: Copy Social API Backup
+    - name: Copy Social files
       ansible.windows.win_copy:
         src: "C:\\Brokeree\\Brokeree.Social\\{{ item.source_file }}"
         dest: "C:\\Brokeree\\Brokeree.Social\\_backup\\{{ backup_file }}\\{{ item.backup_file }}"
         remote_src: true
       loop:
+        #API
         - { source_file: 'API\templates', backup_file: 'API' }
         - { source_file: 'API\ijwhost.dll', backup_file: 'API\ijwhost.dll' }
         - { source_file: 'API\MT5APIManager64.dll', backup_file: 'API\MT5APIManager64.dll' }
@@ -28,3 +29,16 @@
         - { source_file: 'API\wwwadmin.zip', backup_file: 'API\wwwadmin.zip' }
         - { source_file: 'API\wwwuser.zip', backup_file: 'API\wwwuser.zip' }
         - { source_file: 'API\wwwwidgets.zip', backup_file: 'API\wwwwidgets.zip' }
+        #Ratings
+        - { source_file: 'Ratings\ijwhost.dll', backup_file: 'Ratings\ijwhost.dll' }
+        - { source_file: 'Ratings\MT5APIManager64.dll', backup_file: 'Ratings\MT5APIManager64.dll' }
+        - { source_file: 'Ratings\NLog.config', backup_file: 'Ratings\MNLog.config' }
+        - { source_file: 'Ratings\SocialTrading.Ratings.exe', backup_file: 'Ratings\SocialTrading.Ratings.exe' }
+        - { source_file: 'Ratings\wwwcomponents.zip', backup_file: 'Ratings\wwwcomponents.zip' }
+        - { source_file: 'Ratings\wwwroot.zip', backup_file: 'Ratings\wwwroot.zip }
+        - { source_file: 'Ratings\wwwwidgets.zip', backup_file: 'Ratings\wwwwidgets.zip' }
+        #Worker
+        - { source_file: 'Worker\ijwhost.dll', backup_file: 'Worker\ijwhost.dll' }
+        - { source_file: 'Worker\MT5APIManager64.dll', backup_file: 'Worker\MT5APIManager64.dll' }
+        - { source_file: 'Worker\NLog.config', backup_file: 'Worker\MNLog.config' }
+        - { source_file: 'Worker\SocialTrading.Worker.exe', backup_file: 'Worker\SocialTrading.Worker.exe' }      
