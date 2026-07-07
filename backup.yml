@@ -4,10 +4,10 @@
   gather_facts: false
   vars:
     backup_file: "{{ lookup('pipe','date +%Y-%m-%d') }}"
-    social_path: "C:\\Brokeree\\Brokeree.Social"
+    social_path: 'C:\Brokeree\Brokeree.Social'
     api_path: 'C:\Brokeree\Brokeree.Social\API'
-    ratings_path: "C:\\Brokeree\\Brokeree.Social\\Ratings"
-    worker_path: "C:\\Brokeree\\Brokeree.Social\\Worker"
+    ratings_path: 'C:\Brokeree\Brokeree.Social\Ratings'
+    worker_path: 'C:\Brokeree\Brokeree.Social\Worker'
   tasks:
     - name: Create backup directories
       ansible.windows.win_file:
@@ -18,7 +18,7 @@
         - { social_file: "Ratings" }
         - { social_file: "Worker" }
 
-    - name: Copy Social API files - Coping
+    - name: Copy Social API files
       ansible.windows.win_copy:
         src: "{ api_path }\\{{ item.source_file }}"
         dest: "{ social_path }\\_backup\\{{ backup_file }}\\API"
@@ -34,7 +34,7 @@
         - { source_file: 'wwwuser.zip', backup_file: 'wwwuser.zip' }
         - { source_file: 'wwwwidgets.zip', backup_file: 'wwwwidgets.zip' } 
 
-    - name: Copy Social Ratings files - Coping
+    - name: Copy Social Ratings files
       ansible.windows.win_copy:
         src: "{ ratings_path }\\{{ item.source_file }}"
         dest: "{ social_path }\\_backup\\{{ backup_file }}\\Ratings"
@@ -49,7 +49,7 @@
         - { source_file: 'wwwroot.zip', backup_file: 'wwwroot.zip' }
         - { source_file: 'wwwwidgets.zip', backup_file: 'wwwwidgets.zip' }
 
-    - name: Copy Social Worker files - Coping
+    - name: Copy Social Worker files
       ansible.windows.win_copy:
         src: "{ worker_path }\\{{ item.source_file }}"
         dest: "{ social_path }\\_backup\\{{ backup_file }}\\Worker"
