@@ -5,6 +5,9 @@
   vars:
     backup_file: "{{ lookup('pipe','date +%Y-%m-%d') }}"
     social_path: 'C:\Brokeree\Brokeree.Social'
+    api_path: '{{ social_path }}\API'
+    ratings_path: '{{ social_path }}\Ratings'
+    worker_path: '{{ social_path }}\Worker'
   tasks:
     - name: Create backup directories
       ansible.windows.win_file:
@@ -20,7 +23,7 @@
         src: "{{ social_path }}\\API\\{{ item.source_file }}"
         dest: "{{ social_path }}\\_backup\\{{ backup_file }}\\API"
         remote_src: true
-        when: "{{ social_path }}\\API" is directory
+        when: api_path is directory
       loop:
         - { source_file: 'templates', backup_file: '' }
         - { source_file: 'ijwhost.dll', backup_file: 'ijwhost.dll' }
@@ -36,7 +39,7 @@
         src: "{{ social_path }}\\Ratings\\{{ item.source_file }}"
         dest: "{{ social_path }}\\_backup\\{{ backup_file }}\\Ratings"
         remote_src: true
-        when: "{{ social_path }}\\Ratings" is directory
+        when: ratings_path is directory
       loop:
         - { source_file: 'ijwhost.dll', backup_file: 'ijwhost.dll' }
         - { source_file: 'MT5APIManager64.dll', backup_file: 'MT5APIManager64.dll' }
@@ -51,7 +54,7 @@
         src: "{{ social_path }}\\Worker\\{{ item.source_file }}"
         dest: "{{ social_path }}\\_backup\\{{ backup_file }}\\Worker"
         remote_src: true
-        when: "{{ social_path }}\\Worker" is directory
+        when: worker_path is directory
       loop:
         - { source_file: 'ijwhost.dll', backup_file: 'ijwhost.dll' }
         - { source_file: 'MT5APIManager64.dll', backup_file: 'MT5APIManager64.dll' }
