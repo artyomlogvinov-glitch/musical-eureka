@@ -7,11 +7,11 @@
   tasks:
     - name: Create destination directory if it doesn't exist
       ansible.windows.win_file:
-        path: C:\Brokeree\Brokeree.Social\API\_backup
+        path: C:\Brokeree\Brokeree.Social\_backup
         state: directory
 
     - name: Copy a local file to the Windows server
       ansible.windows.win_copy:
         src: C:\Brokeree\Brokeree.Social\API\SocialTrading.API.exe
-        dest: C:\Brokeree\Brokeree.Social\API\_backup\SocialTrading.API.exe
+        dest: C:\Brokeree\Brokeree.Social\_backup\SocialTrading.API.exe
         remote_src: true
