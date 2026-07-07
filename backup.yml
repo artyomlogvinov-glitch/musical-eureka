@@ -4,6 +4,10 @@
   gather_facts: false
   vars:
     backup_file: "{{ lookup('pipe','date +%Y-%m-%d') }}"
+    social_path: "C:\\Brokeree\\Brokeree.Social"
+    api_path: "C:\\Brokeree\\Brokeree.Social\\API"
+    ratings_path: "C:\\Brokeree\\Brokeree.Social\\Ratings"
+    worker_path: "C:\\Brokeree\\Brokeree.Social\\Worker"
   tasks:
     - name: Create backup directories
       ansible.windows.win_file:
@@ -14,15 +18,10 @@
         - { social_file: "Ratings" }
         - { social_file: "Worker" }
 
-    - name: Copy Social API files - Checking
-      ansible.windows.win_stat:
-        path: "C:\\Brokeree\\Brokeree.Social\\API"
-      register: API_file_data
-
     - name: Copy Social API files - Coping
       ansible.windows.win_copy:
-        src: "C:\\Brokeree\\Brokeree.Social\\API\\{{ item.source_file }}"
-        dest: "C:\\Brokeree\\Brokeree.Social\\_backup\\{{ backup_file }}\\API"
+        src: "{ api_path }\\{{ item.source_file }}"
+        dest: "{ social_path }\\_backup\\{{ backup_file }}\\API"
         remote_src: true
         when: API_file_data.stat.exists
       loop:
@@ -35,15 +34,10 @@
         - { source_file: 'wwwuser.zip', backup_file: 'wwwuser.zip' }
         - { source_file: 'wwwwidgets.zip', backup_file: 'wwwwidgets.zip' } 
 
-    - name: Copy Social Ratings files - Checking
-      ansible.windows.win_stat:
-        path: "C:\\Brokeree\\Brokeree.Social\\Ratings"
-      register: Ratings_file_data
-
     - name: Copy Social Ratings files - Coping
       ansible.windows.win_copy:
-        src: "C:\\Brokeree\\Brokeree.Social\\Ratings\\{{ item.source_file }}"
-        dest: "C:\\Brokeree\\Brokeree.Social\\_backup\\{{ backup_file }}\\Ratings"
+        src: "{ ratings_path }\\{{ item.source_file }}"
+        dest: "{ social_path }\\_backup\\{{ backup_file }}\\Ratings"
         remote_src: true
         when: Ratings_file_data.stat.exists
       loop:
@@ -55,17 +49,12 @@
         - { source_file: 'wwwroot.zip', backup_file: 'wwwroot.zip' }
         - { source_file: 'wwwwidgets.zip', backup_file: 'wwwwidgets.zip' }
 
-    - name: Copy Social Worker files - Checking
-      ansible.windows.win_stat:
-        path: "C:\\Brokeree\\Brokeree.Social\\Worker"
-      register: Worker_file_data
-
     - name: Copy Social Worker files - Coping
       ansible.windows.win_copy:
-        src: "C:\\Brokeree\\Brokeree.Social\\Worker\\{{ item.source_file }}"
-        dest: "C:\\Brokeree\\Brokeree.Social\\_backup\\{{ backup_file }}\\Worker"
+        src: "{ worker_path }\\{{ item.source_file }}"
+        dest: "{ social_path }\\_backup\\{{ backup_file }}\\Worker"
         remote_src: true
-        when: "C:\\Brokeree\\Brokeree.Social\\Worker" is directory
+        when: worker_path is directory
       loop:
         - { source_file: 'ijwhost.dll', backup_file: 'ijwhost.dll' }
         - { source_file: 'MT5APIManager64.dll', backup_file: 'MT5APIManager64.dll' }
