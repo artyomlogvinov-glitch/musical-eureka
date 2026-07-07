@@ -1,6 +1,6 @@
 ---
 - name: Windows File/Directory Backup
-  hosts: 65.108.76.197
+  hosts: windows_server_1
   gather_facts: false
   vars:
     backup_file: "{{ lookup('pipe','date +%Y-%m-%d') }}"
