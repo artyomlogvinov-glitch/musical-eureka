@@ -14,7 +14,6 @@
         - { social_file: "API" }
         - { social_file: "Ratings" }
         - { social_file: "Worker" }
-
     - name: Copy Social API files
       ansible.windows.win_copy:
         src: "{ social_path }\\API\\{{ item.source_file }}"
@@ -29,7 +28,6 @@
         - { source_file: 'wwwadmin.zip', backup_file: 'wwwadmin.zip' }
         - { source_file: 'wwwuser.zip', backup_file: 'wwwuser.zip' }
         - { source_file: 'wwwwidgets.zip', backup_file: 'wwwwidgets.zip' } 
-
     - name: Copy Social Ratings files
       ansible.windows.win_copy:
         src: "{ social_path }\\Ratings\\{{ item.source_file }}"
@@ -43,7 +41,6 @@
         - { source_file: 'wwwcomponents.zip', backup_file: 'wwwcomponents.zip' }
         - { source_file: 'wwwroot.zip', backup_file: 'wwwroot.zip' }
         - { source_file: 'wwwwidgets.zip', backup_file: 'wwwwidgets.zip' }
-
     - name: Copy Social Worker files
       ansible.windows.win_copy:
         src: "{ social_path }\\Worker\\{{ item.source_file }}"
