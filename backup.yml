@@ -1,19 +1,20 @@
 ---
-# An employee record
-name: Martin D'vloper
-job: Developer
-skill: Elite
-employed: True
-foods:
-  - Apple
-  - Orange
-  - Strawberry
-  - Mango
-languages:
-  perl: Elite
-  python: Elite
-  pascal: Lame
-education: |
-  4 GCSEs
-  3 A-Levels
-  BSc in the Internet of Things
+- name: Create Remote Backup
+  hosts: 65.108.76.197
+  become: yes
+  vars:
+    backup_source: "C:\Brokeree\Brokeree.Social\API\SocialTrading.API.exe"
+    backup_dest: "C:\Brokeree\Brokeree.Social\_backup"
+  
+  tasks:
+    - name: Create backup directory if it does not exist
+      ansible.builtin.file:
+        path: "{{ backup_dest }}"
+        state: directory
+        mode: '0755'
+
+    - name: Create a timestamped archive
+      community.general.archive:
+        path: "{{ backup_source }}"
+        dest: "{{ backup_dest }}/backup-{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}.tar.gz"
+        format: gz
