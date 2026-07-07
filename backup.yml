@@ -20,7 +20,6 @@
         src: "{ social_path }\\API\\{{ item.source_file }}"
         dest: "{ social_path }\\_backup\\{{ backup_file }}\\API"
         remote_src: true
-        when: API_file_data.stat.exists
       loop:
         - { source_file: 'templates', backup_file: '' }
         - { source_file: 'ijwhost.dll', backup_file: 'ijwhost.dll' }
@@ -33,10 +32,9 @@
 
     - name: Copy Social Ratings files
       ansible.windows.win_copy:
-        src: "{ ratings_path }\\{{ item.source_file }}"
+        src: "{ social_path }\\Ratings\\{{ item.source_file }}"
         dest: "{ social_path }\\_backup\\{{ backup_file }}\\Ratings"
         remote_src: true
-        when: Ratings_file_data.stat.exists
       loop:
         - { source_file: 'ijwhost.dll', backup_file: 'ijwhost.dll' }
         - { source_file: 'MT5APIManager64.dll', backup_file: 'MT5APIManager64.dll' }
@@ -48,10 +46,9 @@
 
     - name: Copy Social Worker files
       ansible.windows.win_copy:
-        src: "{ worker_path }\\{{ item.source_file }}"
+        src: "{ social_path }\\Worker\\{{ item.source_file }}"
         dest: "{ social_path }\\_backup\\{{ backup_file }}\\Worker"
         remote_src: true
-        when: worker_path is directory
       loop:
         - { source_file: 'ijwhost.dll', backup_file: 'ijwhost.dll' }
         - { source_file: 'MT5APIManager64.dll', backup_file: 'MT5APIManager64.dll' }
