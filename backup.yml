@@ -4,10 +4,10 @@
   gather_facts: false
   vars:
     backup_file: "{{ lookup('pipe','date +%Y-%m-%d') }}"
-    social_path: "C:\\Brokeree\\Brokeree.Social"
-    api_path: "C:\\Brokeree\\Brokeree.Social\\API"
-    ratings_path: "C:\\Brokeree\\Brokeree.Social\\Ratings"
-    worker_path: "C:\\Brokeree\\Brokeree.Social\\Worker"
+    social_path: "C:\Brokeree\Brokeree.Social"
+    api_path: "C:\Brokeree\Brokeree.Social\API"
+    ratings_path: "C:\Brokeree\Brokeree.Social\Ratings"
+    worker_path: "C:\Brokeree\Brokeree.Social\Worker"
   tasks:
     - name: Create backup directories
       ansible.windows.win_file:
