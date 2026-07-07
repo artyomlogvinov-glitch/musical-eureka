@@ -7,7 +7,7 @@
   tasks:
     - name: Create backup directory
       ansible.windows.win_file:
-        path: C:\Brokeree\Brokeree.Social\_backup\{{ backup_file }}\{{ social_file }}
+        path: C:\Brokeree\Brokeree.Social\_backup\{{ backup_file }}\{{ item.social_file }}
         state: directory
       loop:
         - { social_file: "API" }
