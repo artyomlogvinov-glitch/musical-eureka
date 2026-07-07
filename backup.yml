@@ -17,7 +17,7 @@
 
     - name: Copy Social API files
       ansible.windows.win_copy:
-        src: "{ social_path }\\API\\{{ item.source_file }}"
+        src: '{ social_path }\API\{{ item.source_file }}'
         dest: "{ social_path }\\_backup\\{{ backup_file }}\\API"
         remote_src: true
         when: API_file_data.stat.exists
