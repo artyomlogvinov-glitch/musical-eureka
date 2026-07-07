@@ -14,11 +14,13 @@
         - { social_file: "API" }
         - { social_file: "Ratings" }
         - { social_file: "Worker" }
+        
     - name: Copy Social API files
       ansible.windows.win_copy:
-        src: "{ social_path }\\API\\{{ item.source_file }}"
-        dest: "{ social_path }\\_backup\\{{ backup_file }}\\API"
+        src: "{{ social_path }}\\API\\{{ item.source_file }}"
+        dest: "{{ social_path }}\\_backup\\{{ backup_file }}\\API"
         remote_src: true
+        when: "{{ social_path }}\\API" is directory
       loop:
         - { source_file: 'templates', backup_file: '' }
         - { source_file: 'ijwhost.dll', backup_file: 'ijwhost.dll' }
@@ -28,11 +30,13 @@
         - { source_file: 'wwwadmin.zip', backup_file: 'wwwadmin.zip' }
         - { source_file: 'wwwuser.zip', backup_file: 'wwwuser.zip' }
         - { source_file: 'wwwwidgets.zip', backup_file: 'wwwwidgets.zip' } 
+        
     - name: Copy Social Ratings files
       ansible.windows.win_copy:
-        src: "{ social_path }\\Ratings\\{{ item.source_file }}"
-        dest: "{ social_path }\\_backup\\{{ backup_file }}\\Ratings"
+        src: "{{ social_path }}\\Ratings\\{{ item.source_file }}"
+        dest: "{{ social_path }}\\_backup\\{{ backup_file }}\\Ratings"
         remote_src: true
+        when: "{{ social_path }}\\Ratings" is directory
       loop:
         - { source_file: 'ijwhost.dll', backup_file: 'ijwhost.dll' }
         - { source_file: 'MT5APIManager64.dll', backup_file: 'MT5APIManager64.dll' }
@@ -41,11 +45,13 @@
         - { source_file: 'wwwcomponents.zip', backup_file: 'wwwcomponents.zip' }
         - { source_file: 'wwwroot.zip', backup_file: 'wwwroot.zip' }
         - { source_file: 'wwwwidgets.zip', backup_file: 'wwwwidgets.zip' }
+        
     - name: Copy Social Worker files
       ansible.windows.win_copy:
-        src: "{ social_path }\\Worker\\{{ item.source_file }}"
-        dest: "{ social_path }\\_backup\\{{ backup_file }}\\Worker"
+        src: "{{ social_path }}\\Worker\\{{ item.source_file }}"
+        dest: "{{ social_path }}\\_backup\\{{ backup_file }}\\Worker"
         remote_src: true
+        when: "{{ social_path }}\\Worker" is directory
       loop:
         - { source_file: 'ijwhost.dll', backup_file: 'ijwhost.dll' }
         - { source_file: 'MT5APIManager64.dll', backup_file: 'MT5APIManager64.dll' }
