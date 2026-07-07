@@ -20,6 +20,11 @@
         dest: "C:\\Brokeree\\Brokeree.Social\\_backup\\{{ backup_file }}\\{{ item.backup_file }}"
         remote_src: true
       loop:
+        - { source_file: 'API\templates', backup_file: 'API\templates' }
+        - { source_file: 'API\ijwhost.dll', backup_file: 'API\ijwhost.dll' }
+        - { source_file: 'API\MT5APIManager64.dll', backup_file: 'API\MT5APIManager64.dll' }
+        - { source_file: 'API\NLog.config', backup_file: 'API\MNLog.config' }
         - { source_file: 'API\SocialTrading.API.exe', backup_file: 'API\SocialTrading.API.exe' }
-        - { source_file: 'mtmanapi64.dll', backup_file: 'mtmanapi64.dll' }
-        - { source_file: 'ijwhost.dll', backup_file: 'ijwhost.dll' }     
+        - { source_file: 'API\wwwadmin.zip', backup_file: 'API\wwwadmin.zip' }
+        - { source_file: 'API\wwwuser.zip', backup_file: 'API\wwwuser.zip' }
+        - { source_file: 'API\wwwwidgets.zip', backup_file: 'API\wwwwidgets.zip' }
