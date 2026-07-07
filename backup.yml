@@ -5,12 +5,16 @@
   vars:
     backup_file: "{{ lookup('pipe','date +%Y-%m-%d') }}"
   tasks:
-    - name: Create destination directory if it doesn't exist
+    - name: Create backup directory
       ansible.windows.win_file:
-        path: C:\Brokeree\Brokeree.Social\_backup\{{ backup_file }}
+        path: C:\Brokeree\Brokeree.Social\_backup\{{ backup_file }}\{{ social_file }}
         state: directory
+      loop:
+        - { social_file: "API" }
+        - { social_file: "Ratings" }
+        - { social_file: "Worker" }
 
-    - name: Copy a local file to the Windows server
+    - name: Copy Social API Backup
       ansible.windows.win_copy:
         src: "C:\\Brokeree\\Brokeree.Social\\API\\{{ item.source_file }}"
         dest: "C:\\Brokeree\\Brokeree.Social\\_backup\\{{ backup_file }}\\{{ item.backup_file }}"
