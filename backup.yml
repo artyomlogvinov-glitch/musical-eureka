@@ -35,7 +35,7 @@
         - { source_file: 'Ratings\NLog.config', backup_file: 'Ratings\MNLog.config' }
         - { source_file: 'Ratings\SocialTrading.Ratings.exe', backup_file: 'Ratings\SocialTrading.Ratings.exe' }
         - { source_file: 'Ratings\wwwcomponents.zip', backup_file: 'Ratings\wwwcomponents.zip' }
-        - { source_file: 'Ratings\wwwroot.zip', backup_file: 'Ratings\wwwroot.zip }
+        - { source_file: 'Ratings\wwwroot.zip', backup_file: 'Ratings\wwwroot.zip' }
         - { source_file: 'Ratings\wwwwidgets.zip', backup_file: 'Ratings\wwwwidgets.zip' }
         #Worker
         - { source_file: 'Worker\ijwhost.dll', backup_file: 'Worker\ijwhost.dll' }
