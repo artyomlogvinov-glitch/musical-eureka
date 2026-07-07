@@ -1,21 +1,17 @@
 ---
-- name: Windows File/Directory Backup
-  hosts: windows_server_1
+- name: Copy files to Windows Server
+  hosts: windows
   gather_facts: false
   vars:
     backup_file: "{{ lookup('pipe','date +%Y-%m-%d') }}"
-  tasks:      
-    - name: Find files in path
-      ansible.windows.win_find:
-        paths: C:\Brokeree\Brokeree.Social\API
-        
-    - name: Ensure target backup directory exists
+  tasks:
+    - name: Create destination directory if it doesn't exist
       ansible.windows.win_file:
-        path: C:\Brokeree\Brokeree.Social\_backup\{{ backup_file }}
+        path: C:\Brokeree\Brokeree.Social\API\_backup
         state: directory
 
-    - name: Copy a single file where the source is on the remote host
+    - name: Copy a local file to the Windows server
       ansible.windows.win_copy:
         src: C:\Brokeree\Brokeree.Social\API\SocialTrading.API.exe
-        dest: C:\Brokeree\Brokeree.Social\{{ backup_file }}\SocialTrading.API.exe
+        dest: C:\Brokeree\Brokeree.Social\API\_backup\SocialTrading.API.exe
         remote_src: true
