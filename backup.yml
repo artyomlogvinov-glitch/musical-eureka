@@ -14,31 +14,24 @@
         - { social_file: "Ratings" }
         - { social_file: "Worker" }
 
-    - name: Copy Social files
+    - name: Copy Social API files - Checking
+      ansible.windows.win_stat:
+        path: "C:\\Brokeree\\Brokeree.Social\\API"
+      register: API_file_data
+
+    - name: Copy Social API files - Coping
       ansible.windows.win_copy:
-        src: "C:\\Brokeree\\Brokeree.Social\\{{ item.source_file }}"
-        dest: "C:\\Brokeree\\Brokeree.Social\\_backup\\{{ backup_file }}\\{{ item.backup_file }}"
+        src: "C:\\Brokeree\\Brokeree.Social\\API\\{{ item.source_file }}"
+        dest: "C:\\Brokeree\\Brokeree.Social\\_backup\\{{ backup_file }}\\API"
         remote_src: true
+        when: API_file_data.stat.exists
       loop:
         #API
-        - { source_file: 'API\templates', backup_file: 'API' }
-        - { source_file: 'API\ijwhost.dll', backup_file: 'API\ijwhost.dll' }
-        - { source_file: 'API\MT5APIManager64.dll', backup_file: 'API\MT5APIManager64.dll' }
-        - { source_file: 'API\NLog.config', backup_file: 'API\MNLog.config' }
-        - { source_file: 'API\SocialTrading.API.exe', backup_file: 'API\SocialTrading.API.exe' }
-        - { source_file: 'API\wwwadmin.zip', backup_file: 'API\wwwadmin.zip' }
-        - { source_file: 'API\wwwuser.zip', backup_file: 'API\wwwuser.zip' }
-        - { source_file: 'API\wwwwidgets.zip', backup_file: 'API\wwwwidgets.zip' }
-        #Ratings
-        - { source_file: 'Ratings\ijwhost.dll', backup_file: 'Ratings\ijwhost.dll' }
-        - { source_file: 'Ratings\MT5APIManager64.dll', backup_file: 'Ratings\MT5APIManager64.dll' }
-        - { source_file: 'Ratings\NLog.config', backup_file: 'Ratings\MNLog.config' }
-        - { source_file: 'Ratings\SocialTrading.Ratings.exe', backup_file: 'Ratings\SocialTrading.Ratings.exe' }
-        - { source_file: 'Ratings\wwwcomponents.zip', backup_file: 'Ratings\wwwcomponents.zip' }
-        - { source_file: 'Ratings\wwwroot.zip', backup_file: 'Ratings\wwwroot.zip' }
-        - { source_file: 'Ratings\wwwwidgets.zip', backup_file: 'Ratings\wwwwidgets.zip' }
-        #Worker
-        - { source_file: 'Worker\ijwhost.dll', backup_file: 'Worker\ijwhost.dll' }
-        - { source_file: 'Worker\MT5APIManager64.dll', backup_file: 'Worker\MT5APIManager64.dll' }
-        - { source_file: 'Worker\NLog.config', backup_file: 'Worker\MNLog.config' }
-        - { source_file: 'Worker\SocialTrading.Worker.exe', backup_file: 'Worker\SocialTrading.Worker.exe' }      
+        - { source_file: 'templates', backup_file: '' }
+        - { source_file: 'ijwhost.dll', backup_file: 'ijwhost.dll' }
+        - { source_file: 'MT5APIManager64.dll', backup_file: 'MT5APIManager64.dll' }
+        - { source_file: 'NLog.config', backup_file: 'MNLog.config' }
+        - { source_file: 'SocialTrading.API.exe', backup_file: 'SocialTrading.API.exe' }
+        - { source_file: 'wwwadmin.zip', backup_file: 'wwwadmin.zip' }
+        - { source_file: 'wwwuser.zip', backup_file: 'wwwuser.zip' }
+        - { source_file: 'wwwwidgets.zip', backup_file: 'wwwwidgets.zip' } 
