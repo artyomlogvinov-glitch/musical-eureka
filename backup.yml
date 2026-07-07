@@ -16,6 +16,6 @@
         dest: "C:\\Brokeree\\Brokeree.Social\\_backup\\{{ backup_file }}\\{{ item.backup_file }}"
         remote_src: true
       loop:
-      - { source_file: 'SocialTrading.API.exe', backup_file: 'SocialTrading.API.exe' }
+        - { source_file: 'SocialTrading.API.exe', backup_file: 'SocialTrading.API.exe' }
         - { source_file: 'mtmanapi64.dll', backup_file: 'mtmanapi64.dll' }
         - { source_file: 'ijwhost.dll', backup_file: 'ijwhost.dll' }     
