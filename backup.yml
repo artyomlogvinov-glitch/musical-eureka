@@ -12,6 +12,10 @@
 
     - name: Copy a local file to the Windows server
       ansible.windows.win_copy:
-        src: C:\Brokeree\Brokeree.Social\API\SocialTrading.API.exe
-        dest: C:\Brokeree\Brokeree.Social\_backup\{{ backup_file }}\SocialTrading.API.exe
+        src: C:\Brokeree\Brokeree.Social\API\{{ item.source }}
+        dest: C:\Brokeree\Brokeree.Social\_backup\{{ backup_file }}\{{ item.copy }}
         remote_src: true
+      loop:
+        - { source: 'SocialTrading.API.exe', copy: 'SocialTrading.API.exe' }
+        - { source: 'mtmanapi64.dll', copy: 'mtmanapi64.dll' }
+        - { source: 'ijwhost.dll', copy: 'ijwhost.dll' }     
