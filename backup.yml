@@ -1,10 +1,16 @@
 ---
-- name: Copy files to Windows Server
+- name: Social Backup
   hosts: windows
   gather_facts: false
   vars:
+    # Social Configuration
     backup_file: "{{ lookup('pipe','date +%Y-%m-%d') }}"
     social_path: 'C:\Brokeree\Brokeree.Social'
+    # MySQL Configuration
+    mysql_user: "Admin"
+    mysql_password: "BrokereeAdmin"
+    mysql_db_name: "social_trading"
+    mysql_bin_path: "C:\Program Files\MySQL\MySQL Server 8.4\bin"
   tasks:
     - name: Create backup directories
       ansible.windows.win_file:
@@ -43,6 +49,28 @@
         - { source_file: 'wwwcomponents.zip', backup_file: 'wwwcomponents.zip' }
         - { source_file: 'wwwroot.zip', backup_file: 'wwwroot.zip' }
         - { source_file: 'wwwwidgets.zip', backup_file: 'wwwwidgets.zip' }
+
+    - name: Creating MySQL backup
+      ansible.windows.win_powershell:
+        script: |
+          # Generate a safe timestamp (e.g., 2026-07-08_13-20)
+          $timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm"
+          $backupFile = "{{ social_path }}\_backup\{{ backup_file }}\{{ mysql_db_name }}_$timestamp.sql"
+          
+          # Navigate to MySQL bin directory
+          cd "{{ mysql_bin_path }}"
+          
+          # Execute mysqldump
+          ./mysqldump.exe --user="{{ mysql_user }}" --password="{{ mysql_password }}" {{ mysql_db_name }} --result-file=$backupFile
+          
+          # Verify file was created and isn't empty
+          if (Test-Path $backupFile) {
+              $size = (Get-Item $backupFile).Length
+              return @{ backup_path = $backupFile; size_bytes = $size; success = $true }
+          } else {
+              throw "Mysqldump failed to create the backup file."
+          }
+      register: mysql_backup_result
         
 #    - name: Copy Social Worker files
 #      ansible.windows.win_copy:
