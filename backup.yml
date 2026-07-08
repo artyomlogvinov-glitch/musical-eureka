@@ -10,7 +10,7 @@
     mysql_user: "Admin"
     mysql_password: "BrokereeAdmin"
     mysql_db_name: "social_trading"
-    mysql_bin_path: "C:\Program Files\MySQL\MySQL Server 8.4\bin"
+    mysql_bin_path: 'C:\Program Files\MySQL\MySQL Server 8.4\bin'
   tasks:
     - name: Create backup directories
       ansible.windows.win_file:
