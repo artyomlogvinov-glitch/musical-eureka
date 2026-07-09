@@ -106,13 +106,12 @@
         state: directory
 
     - name: Download branch-specific artifact from TeamCity
-      ansible.builtin.get_url:
+      ansible.windows.win_get_url:
         # We use TeamCity's locator syntax to grab the latest successful build from a specific branch
         url: "{{ tc_server }}/repository/download/{{ tc_build_type_id }}/latestSuccessful/app_payload.zip?locator=branch:{{ target_branch }}"
         url_username: "oauth2"
         url_password: "{{ tc_token }}"
         dest: "{{ social_path }}\\_update\\{{ backup_file }}\\social.zip"
-      delegate_to: localhost
 
     - name: Extract the branch artifact onto the Windows Server
       community.windows.win_unzip:
