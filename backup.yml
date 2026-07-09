@@ -90,10 +90,7 @@
       service:
         name: "{{ item }}"
         state: stopped
-      when: "item in service_names"
-      loop: "{{ services }}"
-      vars:
-        service_names: "{{ services|dict2items|map(attribute='value.name')|list }}"
+      loop: {{ services | dict2items | map(attribute='key') | intersect(services) }}
 
 #    - name: Start Social Services
 #      service:
