@@ -105,17 +105,29 @@
         path: "{{ social_path }}\\_update\\{{ backup_file }}"
         state: directory
 
+    - name: Query TeamCity for the artifact file list of Build ID {{ latest_build_id }}
+      ansible.builtin.uri:
+        url: "{{ tc_server }}/app/rest/builds/id:{{ latest_build_id }}/artifacts/children"
+        method: GET
+        headers:
+          Accept: "application/json"
+          Authorization: "Bearer {{ tc_token }}"
+        status_code: 200
+      register: tc_artifacts_response
+      delegate_to: localhost
+
     - name: Download branch-specific artifact from TeamCity
-      ansible.windows.win_get_url:
+      ansible.builtin.get_url:
         # We use TeamCity's locator syntax to grab the latest successful build from a specific branch
-        url: "{{ tc_server }}/repository/download/{{ tc_build_type_id }}/latestSuccessful/app_payload.zip?locator=branch:{{ target_branch }}"
+        url: "{{ tc_server }}/repository/download/{{ tc_build_type_id }}/.latestSuccessful/{{ artifact_name }}?locator=branch:{{ target_branch }}"
         url_username: "oauth2"
         url_password: "{{ tc_token }}"
-        dest: "{{ social_path }}\\_update\\{{ backup_file }}\\social.zip"
+        dest: "/tmp/app_payload.zip"
+      delegate_to: localhost
 
     - name: Extract the branch artifact onto the Windows Server
       community.windows.win_unzip:
-        src: "{{ social_path }}\\_update\\{{ backup_file }}\\social.zip"
+        src: "/tmp/app_payload.zip"
         dest: "{{ social_path2 }}"
         rm: true
       
