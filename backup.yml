@@ -93,11 +93,9 @@
         start_mode: manual
       loop: "{{ services }}"
       
-#    - name: Start Social Services
-#      service:
-#        name: {{ item.social_serv }}
+#    - name: Starting Social Services
+#      ansible.windows.win_service:
+#        name: "{{ item }}"
 #        state: running
-#      loop:
-#       - { social_serv: {{ service_social_api }} }
-#       - { social_serv: {{ service_social_ratings }} }
-#        - { source_file: 'SocialTrading.Worker.exe', backup_file: 'SocialTrading.Worker.exe' }  
+#        start_mode: delayed
+#      loop: "{{ services }}"
