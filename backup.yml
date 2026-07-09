@@ -88,7 +88,7 @@
 
     - name: Stop Social Services
       service:
-        name: {{ item }}
+        name: "{{ item }}"
         state: stopped
       when: "item in service_names"
       loop: "{{ services }}"
