@@ -90,7 +90,7 @@
       service:
         name: "{{ item }}"
         state: stopped
-      loop: {{ services | dict2items | map(attribute='key') | intersect(services) }}
+      loop: "{{ services | dict2items | map(attribute='key') | intersect(services) }}"
 
 #    - name: Start Social Services
 #      service:
