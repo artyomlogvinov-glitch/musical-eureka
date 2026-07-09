@@ -36,8 +36,9 @@
           Authorization: "Bearer {{ tc_token }}"
         status_code: 200
       register: tc_build_response
-      - copy: content="{{ tc_build_response | to_nice_json }}" dest="{{social_path}}\\1.json"
       delegate_to: localhost
+      
+    - ansible.windows.win_copy: content="{{ tc_build_response | to_nice_json }}" dest="{{social_path}}\\1.json"     
 
     - name: Fail if no successful builds are found
       ansible.builtin.fail:
