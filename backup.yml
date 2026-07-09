@@ -18,7 +18,7 @@
       - Brokeree.Social.Ratings
     #  - Brokeree.Social.Worker
     #TeamCity
-    target_branch: "support/5.x" 
+    target_branch: "support/5.x"
     tc_server: "https://teamcity.brokeree.dev"
     tc_build_type_id: "SocialPlatform"
     tc_token: "eyJ0eXAiOiAiVENWMiJ9.TUxhRUtTMFlsR1Q2THNVMF9XbUxVcFBZMERa.NzU3OGExZTEtOTFkMS00N2NiLWJkNjYtNzUxNjA4ZjJkNjE3"
@@ -100,7 +100,7 @@
         start_mode: manual
       loop: "{{ services }}"
 
-      - name: Download branch-specific artifact from TeamCity
+    - name: Download branch-specific artifact from TeamCity
       ansible.builtin.get_url:
         # We use TeamCity's locator syntax to grab the latest successful build from a specific branch
         url: "{{ tc_server }}/repository/download/{{ tc_build_type_id }}/latestSuccessful/app_payload.zip?locator=branch:{{ target_branch }}"
