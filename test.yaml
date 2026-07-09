@@ -44,10 +44,11 @@
       when: tc_build_response.json.count == 0
       delegate_to: localhost
 
+    - ansible.windows.win_copy: content="{{ results | to_nice_json }}" dest="{{ social_path }}\\_test\\2.json"
+
     - name: Extract the Build ID
       ansible.builtin.set_fact:
         msg: "{{ tc_build_response.json.count }}"
-        msg: "DONE"
        # latest_build_id: "{{ tc_build_response.json.build[0].id }}"
       delegate_to: localhost
 
