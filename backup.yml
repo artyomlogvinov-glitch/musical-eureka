@@ -87,11 +87,11 @@
       register: mysql_backup_result
 
     - name: Stop Social Services
-      service:
+      ansible.builtin.service:
         name: "{{ item }}"
         state: stopped
-      loop: "{{ services | dict2items | map(attribute='key') | intersect(services) }}"
-
+      loop: "{{ services }}"
+      
 #    - name: Start Social Services
 #      service:
 #        name: {{ item.social_serv }}
