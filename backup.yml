@@ -100,18 +100,23 @@
         start_mode: manual
       loop: "{{ services }}"
 
+    - name: Create update directories
+      ansible.windows.win_file:
+        path: "{{ social_path }}\\_update\\{{ backup_file }}"
+        state: directory
+
     - name: Download branch-specific artifact from TeamCity
       ansible.builtin.get_url:
         # We use TeamCity's locator syntax to grab the latest successful build from a specific branch
         url: "{{ tc_server }}/repository/download/{{ tc_build_type_id }}/latestSuccessful/app_payload.zip?locator=branch:{{ target_branch }}"
         url_username: "oauth2"
         url_password: "{{ tc_token }}"
-        dest: "/tmp/app_payload.zip"
+        dest: "{{ social_path }}\\_update\\{{ backup_file }}\\social.zip"
       delegate_to: localhost
 
     - name: Extract the branch artifact onto the Windows Server
       community.windows.win_unzip:
-        src: "/tmp/app_payload.zip"
+        src: "{{ social_path }}\\_update\\{{ backup_file }}\\social.zip"
         dest: "{{ social_path2 }}"
         rm: true
 
@@ -121,9 +126,9 @@
         state: absent
       delegate_to: localhost
       
-#    - name: Starting Social Services
-#      ansible.windows.win_service:
-#        name: "{{ item }}"
-#        state: running
-#        start_mode: delayed
-#      loop: "{{ services }}"
+    - name: Starting Social Services
+      ansible.windows.win_service:
+        name: "{{ item }}"
+        state: running
+        start_mode: delayed
+      loop: "{{ services }}"
