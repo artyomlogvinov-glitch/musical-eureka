@@ -47,7 +47,7 @@
     - name: Extract the Build ID
       ansible.builtin.set_fact:
         msg: "tc_build_response"
-        latest_build_id: "{{ tc_build_response.json.build[1].id }}"
+        latest_build_id: "{{ tc_build_response.json.build.id }}"
       delegate_to: localhost
 
     # ----------------------------------------------------
