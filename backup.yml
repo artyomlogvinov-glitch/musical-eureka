@@ -119,12 +119,6 @@
         src: "{{ social_path }}\\_update\\{{ backup_file }}\\social.zip"
         dest: "{{ social_path2 }}"
         rm: true
-
-    - name: Clean up the local artifact from the Ansible controller
-      ansible.builtin.file:
-        path: "/tmp/app_payload.zip"
-        state: absent
-      delegate_to: localhost
       
     - name: Starting Social Services
       ansible.windows.win_service:
