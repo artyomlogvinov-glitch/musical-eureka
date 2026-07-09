@@ -87,9 +87,10 @@
       register: mysql_backup_result
 
     - name: Stop Social Services
-      ansible.builtin.service:
+      ansible.windows.win_service:
         name: "{{ item }}"
         state: stopped
+        start_mode: manual
       loop: "{{ services }}"
       
 #    - name: Start Social Services
