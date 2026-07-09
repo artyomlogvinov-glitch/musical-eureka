@@ -6,15 +6,22 @@
     # Social Configuration
     backup_file: "{{ lookup('pipe','date +%Y-%m-%d') }}"
     social_path: 'C:\Brokeree\Brokeree.Social'
+    social_path2: 'C:\Brokeree\Brokeree.Social-2'
     # MySQL Configuration
     mysql_user: "Admin"
     mysql_password: "BrokereeAdmin"
     mysql_db_name: "social_trading"
     mysql_bin_path: 'C:\Program Files\MySQL\MySQL Server 8.4\bin'
+    # Social Services
     services:
       - Brokeree.Social.API
       - Brokeree.Social.Ratings
     #  - Brokeree.Social.Worker
+    #TeamCity
+    target_branch: "support/5.x" 
+    tc_server: "https://teamcity.brokeree.dev"
+    tc_build_type_id: "SocialPlatform"
+    tc_token: "eyJ0eXAiOiAiVENWMiJ9.TUxhRUtTMFlsR1Q2THNVMF9XbUxVcFBZMERa.NzU3OGExZTEtOTFkMS00N2NiLWJkNjYtNzUxNjA4ZjJkNjE3"
   tasks:
     - name: Create backup directories
       ansible.windows.win_file:
@@ -92,6 +99,27 @@
         state: stopped
         start_mode: manual
       loop: "{{ services }}"
+
+      - name: Download branch-specific artifact from TeamCity
+      ansible.builtin.get_url:
+        # We use TeamCity's locator syntax to grab the latest successful build from a specific branch
+        url: "{{ tc_server }}/repository/download/{{ tc_build_type_id }}/latestSuccessful/app_payload.zip?locator=branch:{{ target_branch }}"
+        url_username: "oauth2"
+        url_password: "{{ tc_token }}"
+        dest: "/tmp/app_payload.zip"
+      delegate_to: localhost
+
+    - name: Extract the branch artifact onto the Windows Server
+      community.windows.win_unzip:
+        src: "/tmp/app_payload.zip"
+        dest: "{{ social_path2 }}"
+        rm: true
+
+    - name: Clean up the local artifact from the Ansible controller
+      ansible.builtin.file:
+        path: "/tmp/app_payload.zip"
+        state: absent
+      delegate_to: localhost
       
 #    - name: Starting Social Services
 #      ansible.windows.win_service:
