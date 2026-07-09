@@ -11,6 +11,9 @@
     mysql_password: "BrokereeAdmin"
     mysql_db_name: "social_trading"
     mysql_bin_path: 'C:\Program Files\MySQL\MySQL Server 8.4\bin'
+    service_social_api: "Brokeree.Social.API"
+    service_social_ratings: "Brokeree.Social.Ratings"
+    service_social_worker: "Brokeree.Social.Worker"
   tasks:
     - name: Create backup directories
       ansible.windows.win_file:
@@ -50,6 +53,16 @@
         - { source_file: 'wwwroot.zip', backup_file: 'wwwroot.zip' }
         - { source_file: 'wwwwidgets.zip', backup_file: 'wwwwidgets.zip' }
 
+#    - name: Copy Social Worker files
+#      ansible.windows.win_copy:
+#        src: "{{ social_path }}\\Worker\\{{ item.source_file }}"
+#        dest: "{{ social_path }}\\_backup\\{{ backup_file }}\\Worker"
+#        remote_src: true
+#      loop:
+#        - { source_file: 'ijwhost.dll', backup_file: 'ijwhost.dll' }
+#        - { source_file: 'MT5APIManager64.dll', backup_file: 'MT5APIManager64.dll' }
+#        - { source_file: 'NLog.config', backup_file: 'MNLog.config' }
+
     - name: Creating MySQL backup
       ansible.windows.win_powershell:
         script: |
@@ -71,14 +84,20 @@
               throw "Mysqldump failed to create the backup file."
           }
       register: mysql_backup_result
-        
-#    - name: Copy Social Worker files
-#      ansible.windows.win_copy:
-#        src: "{{ social_path }}\\Worker\\{{ item.source_file }}"
-#        dest: "{{ social_path }}\\_backup\\{{ backup_file }}\\Worker"
-#        remote_src: true
+
+    - name: Stop Social Services
+      service:
+        name: {{ item.social_serv }}
+        state: stopped
+      loop:
+       - { social_serv: {{ service_social_api }} }
+       - { social_serv: {{ service_social_ratings }} }
+
+#    - name: Start Social Services
+#      service:
+#        name: {{ item.social_serv }}
+#        state: running
 #      loop:
-#        - { source_file: 'ijwhost.dll', backup_file: 'ijwhost.dll' }
-#        - { source_file: 'MT5APIManager64.dll', backup_file: 'MT5APIManager64.dll' }
-#        - { source_file: 'NLog.config', backup_file: 'MNLog.config' }
+#       - { social_serv: {{ service_social_api }} }
+#       - { social_serv: {{ service_social_ratings }} }
 #        - { source_file: 'SocialTrading.Worker.exe', backup_file: 'SocialTrading.Worker.exe' }  
