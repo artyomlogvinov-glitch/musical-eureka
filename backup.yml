@@ -11,9 +11,10 @@
     mysql_password: "BrokereeAdmin"
     mysql_db_name: "social_trading"
     mysql_bin_path: 'C:\Program Files\MySQL\MySQL Server 8.4\bin'
-    service_social_api: "Brokeree.Social.API"
-    service_social_ratings: "Brokeree.Social.Ratings"
-    service_social_worker: "Brokeree.Social.Worker"
+    services:
+      - Brokeree.Social.API
+      - Brokeree.Social.Ratings
+    #  - Brokeree.Social.Worker
   tasks:
     - name: Create backup directories
       ansible.windows.win_file:
@@ -87,11 +88,12 @@
 
     - name: Stop Social Services
       service:
-        name: {{ item.social_serv }}
+        name: {{ item }}
         state: stopped
-      loop:
-       - { social_serv: {{ service_social_api }} }
-       - { social_serv: {{ service_social_ratings }} }
+      when: "item in service_names"
+      loop: "{{ services }}"
+      vars:
+        service_names: "{{ services|dict2items|map(attribute='value.name')|list }}"
 
 #    - name: Start Social Services
 #      service:
