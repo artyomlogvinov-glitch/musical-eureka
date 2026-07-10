@@ -60,6 +60,6 @@
 
     - name: Extract the artifact onto the Windows Server
       community.windows.win_unzip:
-        src: "{{ social_path }}\\_update\\{{ date }}"
+        src: "{{ social_path }}\\_update\\{{ date }}\\ST.zip"
         dest: "{{ social_path2  }}"
         rm: true 
