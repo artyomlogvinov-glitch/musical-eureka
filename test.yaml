@@ -4,7 +4,7 @@
   gather_facts: false
   vars:
     # Social Configuration
-    backup_file: "{{ lookup('pipe','date +%Y-%m-%d') }}"
+    date: "{{ lookup('pipe','date +%Y-%m-%d') }}"
     social_path: 'C:\Brokeree\Brokeree.Social'
     social_path2: 'C:\Brokeree\Brokeree.Social-2'
     # MySQL Configuration
@@ -24,10 +24,7 @@
     tc_token: "eyJ0eXAiOiAiVENWMiJ9.bk9YX3RsWnVudS1GQjFxeU5KNFVyQm9tV1Js.NTdiZDRjY2UtNzkxNC00YzFjLWE3ODUtYWNlYTkzMTI2OTVh"
     
   tasks:
-    # ----------------------------------------------------
-    # PHASE 1: Query TeamCity to find the latest Build ID
-    # ----------------------------------------------------
-    - name: Query TeamCity for the latest successful build ID
+    - name: Query TeamCity for the build ID
       ansible.builtin.uri:
         url: "{{ tc_server }}/app/rest/builds?locator=buildType:{{ tc_build_type_id }},branch:{{ target_branch }},status:SUCCESS,count:1"
         method: GET
@@ -44,75 +41,25 @@
       when: tc_build_response.json.count == 0
       delegate_to: localhost
 
-#    - ansible.windows.win_copy: content="{{ tc_build_response | to_nice_json }}" dest="{{ social_path }}\\_test\\2.json"
-
     - name: Extract the Build ID
       ansible.builtin.set_fact:
         latest_build_id: "{{ tc_build_response.json.build[0].id }}"
       delegate_to: localhost
 
-#    - ansible.builtin.debug: msg: "{{ latest_build_id }}"
+    - name: Create update directories
+      ansible.windows.win_file:
+        path: "{{ social_path }}\\_update\\{{ date }}"
+        state: directory
 
-    # ----------------------------------------------------
-    # NEW PHASE: Dynamically discover the Artifact Name
-    # ----------------------------------------------------
-    - name: Query TeamCity for the artifact file list of Build ID {{ latest_build_id }}
-      ansible.builtin.uri:
-        url: "{{ tc_server }}/app/rest/builds/id:{{ latest_build_id }}/artifacts/children"
-        method: GET
-        headers:
-          Accept: "application/json"
-          Authorization: "Bearer {{ tc_token }}"
-        status_code: 200
-      register: tc_artifacts_response
-      delegate_to: localhost
-      
-    - ansible.windows.win_copy: content="{{ tc_artifacts_response | to_nice_json }}" dest="{{ social_path }}\\_test\\1.json"
-
-    - name: Extract the first zip or installer file found in artifacts
-      ansible.builtin.set_fact:
-        # This filters the file list to look for files ending in .zip (change extension if needed)
-        discovered_artifact_name: >-
-          {{
-            tc_artifacts_response.json.file 
-            | selectattr('name', 'search', '\.zip$') 
-            | map(attribute='name') 
-            | first
-          }}
-      delegate_to: localhost
-      failed_when: discovered_artifact_name is not defined
-
-    - name: Log discovered details
-      ansible.builtin.debug:
-        msg: "Found Artifact: '{{ discovered_artifact_name }}' from Build ID: {{ latest_build_id }}"
-
-    # ----------------------------------------------------
-    # PHASE 2: Download the discovered artifact locally
-    # ----------------------------------------------------
-    - name: Download specific artifact from TeamCity controller
+    - name: Download artifacts from TeamCity
       ansible.builtin.get_url:
-        url: "{{ tc_server }}/repository/download/{{ tc_build_type_id }}/{{ latest_build_id }}:id/{{ discovered_artifact_name }}"
+        url: "{{ tc_server }}/repository/downloadALL/{{ tc_build_type_id }}/{{ latest_build_id }}:id"
         url_username: "oauth2"
         url_password: "{{ tc_token }}"
-        dest: "/tmp/{{ discovered_artifact_name }}"
-      delegate_to: localhost
-
-    # ----------------------------------------------------
-    # PHASE 3: Deploy to the Windows Target & Clean Up
-    # ----------------------------------------------------
-    - name: Ensure target directory exists on Windows Server
-      ansible.windows.win_file:
-        path: "{{ social_path2  }}"
-        state: directory
+        dest: "{{ social_path }}\\_update\\{{ date }}"
 
     - name: Extract the artifact onto the Windows Server
       community.windows.win_unzip:
-        src: "/tmp/{{ discovered_artifact_name }}"
+        src: "{{ social_path }}\\_update\\{{ date }}"
         dest: "{{ social_path2  }}"
         rm: true 
-
-    - name: Clean up the local artifact from the Ansible controller
-      ansible.builtin.file:
-        path: "/tmp/{{ discovered_artifact_name }}"
-        state: absent
-      delegate_to: localhost
