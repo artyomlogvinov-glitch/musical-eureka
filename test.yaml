@@ -56,7 +56,7 @@
         url: "{{ tc_server }}/repository/downloadAll/{{ tc_build_type_id }}/{{ latest_build_id }}:id"
         headers:
           Authorization: "Bearer {{ tc_token }}"
-        dest: "{{ social_path }}\\_update\\{{ date }}"
+        dest: "{{ social_path }}\\_update\\{{ date }}\\ST.zip"
 
     - name: Extract the artifact onto the Windows Server
       community.windows.win_unzip:
