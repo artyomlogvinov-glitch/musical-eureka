@@ -20,7 +20,7 @@
     #TeamCity
     target_branch: "support/5.x"
     tc_server: "https://teamcity.brokeree.dev"
-    tc_build_type_id: "SocialPlatform"
+    tc_build_type_id: "SocialPlatform_Build"
     tc_token: "eyJ0eXAiOiAiVENWMiJ9.bk9YX3RsWnVudS1GQjFxeU5KNFVyQm9tV1Js.NTdiZDRjY2UtNzkxNC00YzFjLWE3ODUtYWNlYTkzMTI2OTVh"
     
   tasks:
