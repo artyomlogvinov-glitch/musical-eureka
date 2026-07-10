@@ -53,7 +53,7 @@
 
     - name: Download artifacts from TeamCity
       ansible.windows.win_get_url:
-        url: "{{ tc_server }}/repository/downloadALL/{{ tc_build_type_id }}/{{ latest_build_id }}:id"
+        url: "{{ tc_server }}/repository/downloadAll/{{ tc_build_type_id }}/{{ latest_build_id }}:id"
         url_username: "oauth2"
         url_password: "{{ tc_token }}"
         dest: "{{ social_path }}\\_update\\{{ date }}"
