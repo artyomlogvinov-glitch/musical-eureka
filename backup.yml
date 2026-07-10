@@ -129,7 +129,7 @@
 
     - name: Create update directories
       ansible.windows.win_file:
-        path: "{{ social_path }}\\_update\\{{ date }}"
+        path: "{{ social_path }}\\_update\\{{ date_var }}"
         state: directory
 
     - name: Download artifacts from TeamCity
@@ -137,11 +137,11 @@
         url: "{{ tc_server }}/repository/downloadAll/{{ tc_build_type_id }}/{{ latest_build_id }}:id"
         headers:
           Authorization: "Bearer {{ tc_token }}"
-        dest: "{{ social_path }}\\_update\\{{ date }}\\ST.zip"
+        dest: "{{ social_path }}\\_update\\{{ date_var }}\\ST.zip"
 
     - name: Extract the artifact onto the Social directory
       community.windows.win_unzip:
-        src: "{{ social_path }}\\_update\\{{ date }}\\ST.zip"
+        src: "{{ social_path }}\\_update\\{{ date_var }}\\ST.zip"
         dest: "{{ social_path2  }}"
         rm: true 
       
