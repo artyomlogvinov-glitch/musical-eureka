@@ -4,7 +4,7 @@
   gather_facts: false
   vars:
     # Social Configuration
-    backup_file: "{{ lookup('pipe','date +%Y-%m-%d') }}"
+    date_var: "{{ lookup('pipe','date +%Y-%m-%d') }}"
     social_path: 'C:\Brokeree\Brokeree.Social'
     social_path2: 'C:\Brokeree\Brokeree.Social-2'
     # MySQL Configuration
@@ -22,10 +22,11 @@
     tc_server: "https://teamcity.brokeree.dev"
     tc_build_type_id: "SocialPlatform"
     tc_token: "eyJ0eXAiOiAiVENWMiJ9.bk9YX3RsWnVudS1GQjFxeU5KNFVyQm9tV1Js.NTdiZDRjY2UtNzkxNC00YzFjLWE3ODUtYWNlYTkzMTI2OTVh"
+    
   tasks:
     - name: Create backup directories
       ansible.windows.win_file:
-        path: "{{ social_path }}\\_backup\\{{ backup_file }}\\{{ item.social_file }}"
+        path: "{{ social_path }}\\_backup\\{{ date_var }}\\{{ item.social_file }}"
         state: directory
       loop:
         - { social_file: "API" }
@@ -35,48 +36,48 @@
     - name: Copy Social API files
       ansible.windows.win_copy:
         src: "{{ social_path }}\\API\\{{ item.source_file }}"
-        dest: "{{ social_path }}\\_backup\\{{ backup_file }}\\API"
+        dest: "{{ social_path }}\\_backup\\{{ date_var }}\\API"
         remote_src: true
       loop:
-        - { source_file: 'templates', backup_file: '' }
-        - { source_file: 'ijwhost.dll', backup_file: 'ijwhost.dll' }
-        - { source_file: 'MT5APIManager64.dll', backup_file: 'MT5APIManager64.dll' }
-        - { source_file: 'NLog.config', backup_file: 'MNLog.config' }
-        - { source_file: 'SocialTrading.API.exe', backup_file: 'SocialTrading.API.exe' }
-        - { source_file: 'wwwadmin.zip', backup_file: 'wwwadmin.zip' }
-        - { source_file: 'wwwuser.zip', backup_file: 'wwwuser.zip' }
-        - { source_file: 'wwwwidgets.zip', backup_file: 'wwwwidgets.zip' } 
+        - { source_file: 'templates', date_var: '' }
+        - { source_file: 'ijwhost.dll', date_var: 'ijwhost.dll' }
+        - { source_file: 'MT5APIManager64.dll', date_var: 'MT5APIManager64.dll' }
+        - { source_file: 'NLog.config', date_var: 'MNLog.config' }
+        - { source_file: 'SocialTrading.API.exe', date_var: 'SocialTrading.API.exe' }
+        - { source_file: 'wwwadmin.zip', date_var: 'wwwadmin.zip' }
+        - { source_file: 'wwwuser.zip', date_var: 'wwwuser.zip' }
+        - { source_file: 'wwwwidgets.zip', date_var: 'wwwwidgets.zip' } 
         
     - name: Copy Social Ratings files
       ansible.windows.win_copy:
         src: "{{ social_path }}\\Ratings\\{{ item.source_file }}"
-        dest: "{{ social_path }}\\_backup\\{{ backup_file }}\\Ratings"
+        dest: "{{ social_path }}\\_backup\\{{ date_var }}\\Ratings"
         remote_src: true
       loop:
-        - { source_file: 'ijwhost.dll', backup_file: 'ijwhost.dll' }
-        - { source_file: 'MT5APIManager64.dll', backup_file: 'MT5APIManager64.dll' }
-        - { source_file: 'NLog.config', backup_file: 'MNLog.config' }
-        - { source_file: 'SocialTrading.Ratings.exe', backup_file: 'SocialTrading.Ratings.exe' }
-        - { source_file: 'wwwcomponents.zip', backup_file: 'wwwcomponents.zip' }
-        - { source_file: 'wwwroot.zip', backup_file: 'wwwroot.zip' }
-        - { source_file: 'wwwwidgets.zip', backup_file: 'wwwwidgets.zip' }
+        - { source_file: 'ijwhost.dll', date_var: 'ijwhost.dll' }
+        - { source_file: 'MT5APIManager64.dll', date_var: 'MT5APIManager64.dll' }
+        - { source_file: 'NLog.config', date_var: 'MNLog.config' }
+        - { source_file: 'SocialTrading.Ratings.exe', date_var: 'SocialTrading.Ratings.exe' }
+        - { source_file: 'wwwcomponents.zip', date_var: 'wwwcomponents.zip' }
+        - { source_file: 'wwwroot.zip', date_var: 'wwwroot.zip' }
+        - { source_file: 'wwwwidgets.zip', date_var: 'wwwwidgets.zip' }
 
 #    - name: Copy Social Worker files
 #      ansible.windows.win_copy:
 #        src: "{{ social_path }}\\Worker\\{{ item.source_file }}"
-#        dest: "{{ social_path }}\\_backup\\{{ backup_file }}\\Worker"
+#        dest: "{{ social_path }}\\_backup\\{{ date_var }}\\Worker"
 #        remote_src: true
 #      loop:
-#        - { source_file: 'ijwhost.dll', backup_file: 'ijwhost.dll' }
-#        - { source_file: 'MT5APIManager64.dll', backup_file: 'MT5APIManager64.dll' }
-#        - { source_file: 'NLog.config', backup_file: 'MNLog.config' }
+#        - { source_file: 'ijwhost.dll', date_var: 'ijwhost.dll' }
+#        - { source_file: 'MT5APIManager64.dll', date_var: 'MT5APIManager64.dll' }
+#        - { source_file: 'NLog.config', date_var: 'MNLog.config' }
 
     - name: Creating MySQL backup
       ansible.windows.win_powershell:
         script: |
           # Generate a safe timestamp (e.g., 2026-07-08_13-20)
           $timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm"
-          $backupFile = "{{ social_path }}\_backup\{{ backup_file }}\{{ mysql_db_name }}_$timestamp.sql"
+          $backupFile = "{{ social_path }}\_backup\{{ date_var }}\{{ mysql_db_name }}_$timestamp.sql"
           
           # Navigate to MySQL bin directory
           cd "{{ mysql_bin_path }}"
@@ -102,34 +103,48 @@
 
     - name: Create update directories
       ansible.windows.win_file:
-        path: "{{ social_path }}\\_update\\{{ backup_file }}"
+        path: "{{ social_path }}\\_update\\{{ date_var }}"
         state: directory
 
-    - name: Query TeamCity for the artifact file list of Build ID {{ latest_build_id }}
+    - name: Query TeamCity for the build ID
       ansible.builtin.uri:
-        url: "{{ tc_server }}/app/rest/builds/id:{{ latest_build_id }}/artifacts/children"
+        url: "{{ tc_server }}/app/rest/builds?locator=buildType:{{ tc_build_type_id }},branch:{{ target_branch }},status:SUCCESS,count:1"
         method: GET
         headers:
           Accept: "application/json"
           Authorization: "Bearer {{ tc_token }}"
         status_code: 200
-      register: tc_artifacts_response
+      register: tc_build_response
       delegate_to: localhost
 
-    - name: Download branch-specific artifact from TeamCity
-      ansible.builtin.get_url:
-        # We use TeamCity's locator syntax to grab the latest successful build from a specific branch
-        url: "{{ tc_server }}/repository/download/{{ tc_build_type_id }}/.latestSuccessful/{{ artifact_name }}?locator=branch:{{ target_branch }}"
-        url_username: "oauth2"
-        url_password: "{{ tc_token }}"
-        dest: "/tmp/app_payload.zip"
+    - name: Fail if no successful builds are found
+      ansible.builtin.fail:
+        msg: "No successful builds found for branch '{{ target_branch }}'."
+      when: tc_build_response.json.count == 0
       delegate_to: localhost
 
-    - name: Extract the branch artifact onto the Windows Server
+    - name: Extract the Build ID
+      ansible.builtin.set_fact:
+        latest_build_id: "{{ tc_build_response.json.build[0].id }}"
+      delegate_to: localhost
+
+    - name: Create update directories
+      ansible.windows.win_file:
+        path: "{{ social_path }}\\_update\\{{ date }}"
+        state: directory
+
+    - name: Download artifacts from TeamCity
+      ansible.windows.win_get_url:
+        url: "{{ tc_server }}/repository/downloadAll/{{ tc_build_type_id }}/{{ latest_build_id }}:id"
+        headers:
+          Authorization: "Bearer {{ tc_token }}"
+        dest: "{{ social_path }}\\_update\\{{ date }}\\ST.zip"
+
+    - name: Extract the artifact onto the Social directory
       community.windows.win_unzip:
-        src: "/tmp/app_payload.zip"
-        dest: "{{ social_path2 }}"
-        rm: true
+        src: "{{ social_path }}\\_update\\{{ date }}\\ST.zip"
+        dest: "{{ social_path2  }}"
+        rm: true 
       
     - name: Starting Social Services
       ansible.windows.win_service:
