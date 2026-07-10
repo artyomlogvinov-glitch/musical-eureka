@@ -48,9 +48,11 @@
 
     - name: Extract the Build ID
       ansible.builtin.set_fact:
-        msg: "{{ tc_build_response.json.count }}"
-       # latest_build_id: "{{ tc_build_response.json.build[0].id }}"
+        latest_build_id: "{{ tc_build_response.json.build[0].id }}"
       delegate_to: localhost
+
+    - ansible.builtin.debug:
+        msg: "{{ latest_build_id }}"
 
     # ----------------------------------------------------
     # NEW PHASE: Dynamically discover the Artifact Name
