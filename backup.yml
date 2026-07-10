@@ -76,7 +76,7 @@
       ansible.windows.win_powershell:
         script: |
           # Generate a back file name
-          $backupFile = "{{ social_path }}\_backup\{{ date_var }}\{{ mysql_db_name }}_{{ data_var }}.sql"
+          $backupFile = "{{ social_path }}\_backup\{{ date_var }}\{{ mysql_db_name }}_{{ date_var }}.sql"
           
           # Navigate to MySQL bin directory
           cd "{{ mysql_bin_path }}"
