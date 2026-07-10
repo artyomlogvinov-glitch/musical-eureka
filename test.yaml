@@ -44,14 +44,14 @@
       when: tc_build_response.json.count == 0
       delegate_to: localhost
 
-    - ansible.windows.win_copy: content="{{ tc_build_response | to_nice_json }}" dest="{{ social_path }}\\_test\\2.json"
+#    - ansible.windows.win_copy: content="{{ tc_build_response | to_nice_json }}" dest="{{ social_path }}\\_test\\2.json"
 
     - name: Extract the Build ID
       ansible.builtin.set_fact:
         latest_build_id: "{{ tc_build_response.json.build[0].id }}"
       delegate_to: localhost
 
-    - ansible.builtin.debug:
+#    - ansible.builtin.debug:
         msg: "{{ latest_build_id }}"
 
     # ----------------------------------------------------
@@ -67,6 +67,8 @@
         status_code: 200
       register: tc_artifacts_response
       delegate_to: localhost
+      
+    - ansible.windows.win_copy: content="{{ tc_artifacts_response | to_nice_json }}" dest="{{ social_path }}\\_test\\1.json"
 
     - name: Extract the first zip or installer file found in artifacts
       ansible.builtin.set_fact:
