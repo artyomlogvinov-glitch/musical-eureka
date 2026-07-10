@@ -75,9 +75,8 @@
     - name: Creating MySQL backup
       ansible.windows.win_powershell:
         script: |
-          # Generate a safe timestamp (e.g., 2026-07-08_13-20)
-          $timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm"
-          $backupFile = "{{ social_path }}\_backup\{{ date_var }}\{{ mysql_db_name }}_$timestamp.sql"
+          # Generate a back file name
+          $backupFile = "{{ social_path }}\_backup\{{ date_var }}\{{ mysql_db_name }}_{{ data_var }}.sql"
           
           # Navigate to MySQL bin directory
           cd "{{ mysql_bin_path }}"
