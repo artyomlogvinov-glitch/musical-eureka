@@ -5,7 +5,6 @@
   vars:
     # Social Configuration
     date_var: "{{ lookup('pipe','date +%Y-%m-%d') }}"
-    social_path2: 'C:\Brokeree\Brokeree.Social-2'
     # Social Services
     services:
       - {{ social_service }}.API
@@ -131,7 +130,7 @@
     - name: Extract the artifact onto the Social directory
       community.windows.win_unzip:
         src: "{{ social_path }}\\_update\\{{ date_var }}\\ST.zip"
-        dest: "{{ social_path2  }}"
+        dest: "{{ social_path  }}"
         rm: true 
       
     - name: Starting Social Services
