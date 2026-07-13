@@ -9,7 +9,7 @@
       - Core
       - Web
       - Ratings
-    pamm_path2: "C:\Brokeree\Brokeree.PAMM-2"
+    pamm_path2: "C:\\Brokeree\\Brokeree.PAMM-2"
     #TeamCity
     target_branch: "epic/PAMM-2739"
     tc_server: "https://teamcity.brokeree.dev"
