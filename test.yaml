@@ -7,8 +7,8 @@
     date_var: "{{ lookup('pipe','date +%Y-%m-%d') }}"
     # Social Services
     services:
-      - "{{ social_service }}".API
-      - "{{ social_service }}".Ratings
+      - "{{ social_service }}.API"
+      - "{{ social_service }}.Ratings"
     #  - Brokeree.Social.Worker
     #TeamCity
 #    target_branch: "support/5.x"
