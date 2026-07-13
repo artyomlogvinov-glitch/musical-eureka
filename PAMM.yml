@@ -1,7 +1,7 @@
 ---
 - name: PAMM Deploy
   hosts: windows
-  gather_facts: false
+  gather_facts: true
   vars:
     #Application settings
     date_var: "{{ lookup('pipe','date +%Y-%m-%d') }}"
