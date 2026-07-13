@@ -65,9 +65,9 @@
         - { source_file: 'PAMM.API.xml', backup_file: 'PAMM.API.xml' }
         - { source_file: 'PAMM.Model.xml', backup_file: 'PAMM.Model.xml' }
         - { source_file: 'PAMM.Web.exe', backup_file: 'PAMM.Web.exe' }
-        - { source_file: 'wwwadmin.zip', backup_file: 'wwwadmin.zip' }
-        - { source_file: 'wwwinventory.zip', backup_file: 'wwwinventory.zip' }
-        - { source_file: 'wwwmanager.zip', backup_file: 'wwwmanager.zip' } 
+#        - { source_file: 'wwwadmin.zip', backup_file: 'wwwadmin.zip' }
+#        - { source_file: 'wwwinventory.zip', backup_file: 'wwwinventory.zip' }
+#       - { source_file: 'wwwmanager.zip', backup_file: 'wwwmanager.zip' } 
 
     - name: Stop PAMM Services
       ansible.windows.win_service:
