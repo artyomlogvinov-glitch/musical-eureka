@@ -7,8 +7,8 @@
     date_var: "{{ lookup('pipe','date +%Y-%m-%d') }}"
     # Social Services
     services:
-      - {{ social_service }}.API
-      - {{ social_service }}.Ratings
+      - "{{ social_service }}.API"
+      - "{{ social_service }}.Ratings"
     #  - Brokeree.Social.Worker
     #TeamCity
 #    target_branch: "support/5.x"
@@ -67,13 +67,10 @@
 
     - name: Stop Social Services
       ansible.windows.win_service:
-        name: "{{ social_service }}.API"
+        name: "{{ item }}"
         state: stopped
         start_mode: manual
-      ansible.windows.win_service:
-        name: "{{ social_service }}.Ratings"
-        state: stopped
-        start_mode: manual
+     loop: "{{ services }}"
       
     - name: Creating MySQL backup
       ansible.windows.win_powershell:
