@@ -35,7 +35,7 @@
         - { source_file: 'ijwhost.dll', date_var: 'ijwhost.dll' }
         - { source_file: 'MT5APIManager64.dll', date_var: 'MT5APIManager64.dll' }
         - { source_file: 'NLog.config', date_var: 'MNLog.config' }
-        - { source_file: 'SocialTrading.API.exe', date_var: 'PAMM.exe' }
+        - { source_file: 'PAMM.exe', date_var: 'PAMM.exe' }
         
     - name: Copy PAMM Ratings
       ansible.windows.win_copy:
