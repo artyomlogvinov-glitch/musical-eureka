@@ -4,7 +4,7 @@
   gather_facts: false
   vars:
     #Application settings
-    date_var: "{{ lookup('pipe','date +%Y-%m-%d'-%H%M) }}"
+    date_var: "{{ lookup('pipe','date +%Y-%m-%d-%H%M') }}"
     backup_file: "{{ date_var }}"
     services:
       - Core
