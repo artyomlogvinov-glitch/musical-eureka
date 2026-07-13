@@ -67,10 +67,13 @@
 
     - name: Stop Social Services
       ansible.windows.win_service:
-        name: "{{ item }}"
+        name: "{{ social_service }}.API"
         state: stopped
         start_mode: manual
-      loop: "{{ services }}"
+      ansible.windows.win_service:
+        name: "{{ social_service }}.Ratings"
+        state: stopped
+        start_mode: manual
       
     - name: Creating MySQL backup
       ansible.windows.win_powershell:
