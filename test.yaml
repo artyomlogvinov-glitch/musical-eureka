@@ -7,8 +7,8 @@
     date_var: "{{ lookup('pipe','date +%Y-%m-%d') }}"
     # Social Services
     services:
-      - "{{ social_service }}.API"
-      - "{{ social_service }}.Ratings"
+      - API
+      - Ratings
     #  - Brokeree.Social.Worker
     #TeamCity
 #    target_branch: "support/5.x"
@@ -67,7 +67,7 @@
 
     - name: Stop Social Services
       ansible.windows.win_service:
-        name: "{{ item }}"
+        name: "{{ social_service }}.{{ item }}"
         state: stopped
         start_mode: manual
      loop: "{{ services }}"
