@@ -4,7 +4,8 @@
   gather_facts: false
   vars:
     #Application settings
-    date_var: "{{ lookup('pipe','date +%Y-%m-%d-%H%M') }}"
+    date_var: "{{ lookup('pipe','date +%Y-%m-%d') }}"
+    backup_file: "{{ date_var }}-{{ semaphore_task_id }}"
     services:
       - Core
       - Web
@@ -19,7 +20,7 @@
   tasks:
     - name: Create backup directories
       ansible.windows.win_file:
-        path: "{{ pamm_path }}\\_backup\\{{ date_var }}\\{{ item.pamm_file }}"
+        path: "{{ pamm_path }}\\_backup\\{{ backup_file }}\\{{ item.pamm_file }}"
         state: directory
       loop:
         - { pamm_file: "PAMM" }
@@ -29,44 +30,44 @@
     - name: Copy PAMM Core
       ansible.windows.win_copy:
         src: "{{ pamm_path }}\\PAMM\\{{ item.source_file }}"
-        dest: "{{ pamm_path }}\\_backup\\{{ date_var }}\\PAMM"
+        dest: "{{ pamm_path }}\\_backup\\{{ backup_file }}\\PAMM"
         remote_src: true
       loop:
-        - { source_file: 'ijwhost.dll', date_var: 'ijwhost.dll' }
-        - { source_file: 'MT5APIManager64.dll', date_var: 'MT5APIManager64.dll' }
-        - { source_file: 'NLog.config', date_var: 'MNLog.config' }
-        - { source_file: 'PAMM.exe', date_var: 'PAMM.exe' }
+        - { source_file: 'ijwhost.dll', backup_file: 'ijwhost.dll' }
+        - { source_file: 'MT5APIManager64.dll', backup_file: 'MT5APIManager64.dll' }
+        - { source_file: 'NLog.config', backup_file: 'MNLog.config' }
+        - { source_file: 'PAMM.exe', backup_file: 'PAMM.exe' }
         
     - name: Copy PAMM Ratings
       ansible.windows.win_copy:
         src: "{{ pamm_path }}\\PAMM.Ratings\\{{ item.source_file }}"
-        dest: "{{ pamm_path }}\\_backup\\{{ date_var }}\\PAMM.Ratings"
+        dest: "{{ pamm_path }}\\_backup\\{{ backup_file }}\\PAMM.Ratings"
         remote_src: true
       loop:
-        - { source_file: 'ijwhost.dll', date_var: 'ijwhost.dll' }
-        - { source_file: 'MT5APIManager64.dll', date_var: 'MT5APIManager64.dll' }
-        - { source_file: 'NLog.config', date_var: 'MNLog.config' }
-        - { source_file: 'PAMM.Ratings.exe', date_var: 'PAMM.Ratings.exe' }
-        - { source_file: 'wwwcomponents.zip', date_var: 'wwwcomponents.zip' }
-        - { source_file: 'wwwroot.zip', date_var: 'wwwroot.zip' }
-        - { source_file: 'wwwwidgets.zip', date_var: 'wwwwidgets.zip' }
+        - { source_file: 'ijwhost.dll', backup_file: 'ijwhost.dll' }
+        - { source_file: 'MT5APIManager64.dll', backup_file: 'MT5APIManager64.dll' }
+        - { source_file: 'NLog.config', backup_file: 'MNLog.config' }
+        - { source_file: 'PAMM.Ratings.exe', backup_file: 'PAMM.Ratings.exe' }
+        - { source_file: 'wwwcomponents.zip', backup_file: 'wwwcomponents.zip' }
+        - { source_file: 'wwwroot.zip', backup_file: 'wwwroot.zip' }
+        - { source_file: 'wwwwidgets.zip', backup_file: 'wwwwidgets.zip' }
 
     - name: Copy PAMM Web
       ansible.windows.win_copy:
         src: "{{ pamm_path }}\\PAMM.Web\\{{ item.source_file }}"
-        dest: "{{ pamm_path }}\\_backup\\{{ date_var }}\\PAMM.Web"
+        dest: "{{ pamm_path }}\\_backup\\{{ backup_file }}\\PAMM.Web"
         remote_src: true
       loop:
-        - { source_file: 'templates', date_var: '' }
-        - { source_file: 'ijwhost.dll', date_var: 'ijwhost.dll' }
-        - { source_file: 'MT5APIManager64.dll', date_var: 'MT5APIManager64.dll' }
-        - { source_file: 'NLog.config', date_var: 'MNLog.config' }
-        - { source_file: 'PAMM.API.xml', date_var: 'PAMM.API.xml' }
-        - { source_file: 'PAMM.Model.xml', date_var: 'PAMM.Model.xml' }
-        - { source_file: 'PAMM.Web.exe', date_var: 'PAMM.Web.exe' }
-        - { source_file: 'wwwadmin.zip', date_var: 'wwwadmin.zip' }
-        - { source_file: 'wwwinventory.zip', date_var: 'wwwinventory.zip' }
-        - { source_file: 'wwwmanager.zip', date_var: 'wwwmanager.zip' } 
+        - { source_file: 'templates', backup_file: '' }
+        - { source_file: 'ijwhost.dll', backup_file: 'ijwhost.dll' }
+        - { source_file: 'MT5APIManager64.dll', backup_file: 'MT5APIManager64.dll' }
+        - { source_file: 'NLog.config', backup_file: 'MNLog.config' }
+        - { source_file: 'PAMM.API.xml', backup_file: 'PAMM.API.xml' }
+        - { source_file: 'PAMM.Model.xml', backup_file: 'PAMM.Model.xml' }
+        - { source_file: 'PAMM.Web.exe', backup_file: 'PAMM.Web.exe' }
+        - { source_file: 'wwwadmin.zip', backup_file: 'wwwadmin.zip' }
+        - { source_file: 'wwwinventory.zip', backup_file: 'wwwinventory.zip' }
+        - { source_file: 'wwwmanager.zip', backup_file: 'wwwmanager.zip' } 
 
     - name: Stop PAMM Services
       ansible.windows.win_service:
@@ -79,7 +80,7 @@
       ansible.windows.win_powershell:
         script: |
           # Generate a back file name
-          $backupFile = "{{ pamm_path }}\_backup\{{ date_var }}\{{ mysql_db_name }}_{{ date_var }}.sql"
+          $backupFile = "{{ pamm_path }}\_backup\{{ backup_file }}\{{ mysql_db_name }}_{{ backup_file }}.sql"
           
           # Navigate to MySQL bin directory
           cd "{{ mysql_bin_path }}"
@@ -98,7 +99,7 @@
 
     - name: Create update directories
       ansible.windows.win_file:
-        path: "{{ pamm_path }}\\_update\\{{ date_var }}"
+        path: "{{ pamm_path }}\\_update\\{{ backup_file }}"
         state: directory
 
     - name: Query TeamCity for the build ID
@@ -128,11 +129,11 @@
         url: "{{ tc_server }}/repository/downloadAll/{{ tc_build_type_id }}/{{ latest_build_id }}:id"
         headers:
           Authorization: "Bearer {{ tc_token }}"
-        dest: "{{ pamm_path }}\\_update\\{{ date_var }}\\PAMM.zip"
+        dest: "{{ pamm_path }}\\_update\\{{ backup_file }}\\PAMM.zip"
 
     - name: Extract the artifact onto the Social directory
       community.windows.win_unzip:
-        src: "{{ pamm_path }}\\_update\\{{ date_var }}\\PAMM.zip"
+        src: "{{ pamm_path }}\\_update\\{{ backup_file }}\\PAMM.zip"
         dest: "{{ pamm_path2 }}"
         rm: true 
       
