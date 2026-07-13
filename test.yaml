@@ -135,7 +135,7 @@
       
     - name: Starting Social Services
       ansible.windows.win_service:
-        name: "{{ item }}"
+        name: "{{ social_service }}.{{ item }}"
         state: started
         start_mode: delayed
       loop: "{{ services }}"
