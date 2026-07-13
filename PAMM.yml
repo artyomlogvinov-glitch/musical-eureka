@@ -5,7 +5,7 @@
   vars:
     #Application settings
     date_var: "{{ lookup('pipe','date +%Y-%m-%d') }}"
-    backup_file: "{{ date_var }}-{{ semaphore_task_id }}"
+    backup_file: "{{ date_var }}-{{ ansible_env.SEMAPHORE_TASK_ID }}"
     services:
       - Core
       - Web
