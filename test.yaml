@@ -66,6 +66,13 @@
 #        - { source_file: 'MT5APIManager64.dll', date_var: 'MT5APIManager64.dll' }
 #        - { source_file: 'NLog.config', date_var: 'MNLog.config' }
 
+    - name: Stop Social Services
+      ansible.windows.win_service:
+        name: "{{ item }}"
+        state: stopped
+        start_mode: manual
+      loop: "{{ services }}"
+      
     - name: Creating MySQL backup
       ansible.windows.win_powershell:
         script: |
@@ -86,13 +93,6 @@
               throw "Mysqldump failed to create the backup file."
           }
       register: mysql_backup_result
-
-    - name: Stop Social Services
-      ansible.windows.win_service:
-        name: "{{ item }}"
-        state: stopped
-        start_mode: manual
-      loop: "{{ services }}"
 
     - name: Create update directories
       ansible.windows.win_file:
@@ -120,11 +120,6 @@
       ansible.builtin.set_fact:
         latest_build_id: "{{ tc_build_response.json.build[0].id }}"
       delegate_to: localhost
-
-    - name: Create update directories
-      ansible.windows.win_file:
-        path: "{{ social_path }}\\_update\\{{ date_var }}"
-        state: directory
 
     - name: Download artifacts from TeamCity
       ansible.windows.win_get_url:
