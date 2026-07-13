@@ -1,1 +1,144 @@
+---
+- name: PAMM Deploy
+  hosts: windows
+  gather_facts: false
+  vars:
+    #Application settings
+    date_var: "{{ lookup('pipe','date +%Y-%m-%d-%H%M') }}"
+    services:
+      - Core
+      - Web
+      - Ratings
+    pamm_path2: "C:\Brokeree\Brokeree.PAMM-2"
+    #TeamCity
+    target_branch: "epic/PAMM-2739"
+    tc_server: "https://teamcity.brokeree.dev"
+    tc_build_type_id: "PAMM"
+    tc_token: "eyJ0eXAiOiAiVENWMiJ9.bk9YX3RsWnVudS1GQjFxeU5KNFVyQm9tV1Js.NTdiZDRjY2UtNzkxNC00YzFjLWE3ODUtYWNlYTkzMTI2OTVh"
+    
+  tasks:
+    - name: Create backup directories
+      ansible.windows.win_file:
+        path: "{{ pamm_path }}\\_backup\\{{ date_var }}\\{{ item.pamm_file }}"
+        state: directory
+      loop:
+        - { pamm_file: "PAMM" }
+        - { pamm_file: "PAMM.Ratings" }
+        - { pamm_file: "PAMM.Web" }
+        
+    - name: Copy PAMM Core
+      ansible.windows.win_copy:
+        src: "{{ pamm_path }}\\PAMM\\{{ item.source_file }}"
+        dest: "{{ pamm_path }}\\_backup\\{{ date_var }}\\PAMM"
+        remote_src: true
+      loop:
+        - { source_file: 'ijwhost.dll', date_var: 'ijwhost.dll' }
+        - { source_file: 'MT5APIManager64.dll', date_var: 'MT5APIManager64.dll' }
+        - { source_file: 'NLog.config', date_var: 'MNLog.config' }
+        - { source_file: 'SocialTrading.API.exe', date_var: 'PAMM.exe' }
+        
+    - name: Copy PAMM Ratings
+      ansible.windows.win_copy:
+        src: "{{ pamm_path }}\\PAMM.Ratings\\{{ item.source_file }}"
+        dest: "{{ pamm_path }}\\_backup\\{{ date_var }}\\PAMM.Ratings"
+        remote_src: true
+      loop:
+        - { source_file: 'ijwhost.dll', date_var: 'ijwhost.dll' }
+        - { source_file: 'MT5APIManager64.dll', date_var: 'MT5APIManager64.dll' }
+        - { source_file: 'NLog.config', date_var: 'MNLog.config' }
+        - { source_file: 'PAMM.Ratings.exe', date_var: 'PAMM.Ratings.exe' }
+        - { source_file: 'wwwcomponents.zip', date_var: 'wwwcomponents.zip' }
+        - { source_file: 'wwwroot.zip', date_var: 'wwwroot.zip' }
+        - { source_file: 'wwwwidgets.zip', date_var: 'wwwwidgets.zip' }
 
+    - name: Copy PAMM Web
+      ansible.windows.win_copy:
+        src: "{{ pamm_path }}\\PAMM.Web\\{{ item.source_file }}"
+        dest: "{{ pamm_path }}\\_backup\\{{ date_var }}\\PAMM.Web"
+        remote_src: true
+      loop:
+        - { source_file: 'templates', date_var: '' }
+        - { source_file: 'ijwhost.dll', date_var: 'ijwhost.dll' }
+        - { source_file: 'MT5APIManager64.dll', date_var: 'MT5APIManager64.dll' }
+        - { source_file: 'NLog.config', date_var: 'MNLog.config' }
+        - { source_file: 'PAMM.API.xml', date_var: 'PAMM.API.xml' }
+        - { source_file: 'PAMM.Model.xml', date_var: 'PAMM.Model.xml' }
+        - { source_file: 'PAMM.Web.exe', date_var: 'PAMM.Web.exe' }
+        - { source_file: 'wwwadmin.zip', date_var: 'wwwadmin.zip' }
+        - { source_file: 'wwwinventory.zip', date_var: 'wwwinventory.zip' }
+        - { source_file: 'wwwmanager.zip', date_var: 'wwwmanager.zip' } 
+
+    - name: Stop PAMM Services
+      ansible.windows.win_service:
+        name: "{{ pamm_service }}.{{ item }}"
+        state: stopped
+        start_mode: manual
+      loop: "{{ services }}"
+      
+    - name: Creating MySQL backup
+      ansible.windows.win_powershell:
+        script: |
+          # Generate a back file name
+          $backupFile = "{{ pamm_path }}\_backup\{{ date_var }}\{{ mysql_db_name }}_{{ date_var }}.sql"
+          
+          # Navigate to MySQL bin directory
+          cd "{{ mysql_bin_path }}"
+          
+          # Execute mysqldump
+          ./mysqldump.exe --user="{{ mysql_user }}" --password="{{ mysql_password }}" {{ mysql_db_name }} --result-file=$backupFile
+          
+          # Verify file was created and isn't empty
+          if (Test-Path $backupFile) {
+              $size = (Get-Item $backupFile).Length
+              return @{ backup_path = $backupFile; size_bytes = $size; success = $true }
+          } else {
+              throw "Mysqldump failed to create the backup file."
+          }
+      register: mysql_backup_result
+
+    - name: Create update directories
+      ansible.windows.win_file:
+        path: "{{ pamm_path }}\\_update\\{{ date_var }}"
+        state: directory
+
+    - name: Query TeamCity for the build ID
+      ansible.builtin.uri:
+        url: "{{ tc_server }}/app/rest/builds?locator=buildType:{{ tc_build_type_id }},branch:{{ target_branch }},status:SUCCESS,count:1"
+        method: GET
+        headers:
+          Accept: "application/json"
+          Authorization: "Bearer {{ tc_token }}"
+        status_code: 200
+      register: tc_build_response
+      delegate_to: localhost
+
+    - name: Fail if no successful builds are found
+      ansible.builtin.fail:
+        msg: "No successful builds found for branch '{{ target_branch }}'."
+      when: tc_build_response.json.count == 0
+      delegate_to: localhost
+
+    - name: Extract the Build ID
+      ansible.builtin.set_fact:
+        latest_build_id: "{{ tc_build_response.json.build[0].id }}"
+      delegate_to: localhost
+
+    - name: Download artifacts from TeamCity
+      ansible.windows.win_get_url:
+        url: "{{ tc_server }}/repository/downloadAll/{{ tc_build_type_id }}/{{ latest_build_id }}:id"
+        headers:
+          Authorization: "Bearer {{ tc_token }}"
+        dest: "{{ pamm_path }}\\_update\\{{ date_var }}\\PAMM.zip"
+
+    - name: Extract the artifact onto the Social directory
+      community.windows.win_unzip:
+        src: "{{ pamm_path }}\\_update\\{{ date_var }}\\PAMM.zip"
+        dest: "{{ pamm_path2 }}"
+        rm: true 
+      
+    - name: Starting Social Services
+      ansible.windows.win_service:
+        name: "{{ pamm_service }}.{{ item }}"
+        state: started
+        start_mode: delayed
+      loop: "{{ services }}"
