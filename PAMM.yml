@@ -4,8 +4,8 @@
   gather_facts: true
   vars:
     #Application settings
-    date_var: "{{ lookup('pipe','date +%Y-%m-%d') }}"
-    backup_file: "{{ date_var }}-{{ ansible_env.SEMAPHORE_TASK_ID }}"
+    date_var: "{{ lookup('pipe','date +%Y-%m-%d'-%H%M) }}"
+    backup_file: "{{ date_var }}"
     services:
       - Core
       - Web
