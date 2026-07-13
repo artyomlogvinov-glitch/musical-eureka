@@ -8,8 +8,8 @@
     social_path2: 'C:\Brokeree\Brokeree.Social-2'
     # Social Services
     services:
-      - Brokeree.Social.API
-      - Brokeree.Social.Ratings
+      - {{ social_service }}.API
+      - {{ social_service }}.Ratings
     #  - Brokeree.Social.Worker
     #TeamCity
     target_branch: "support/5.x"
