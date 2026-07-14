@@ -11,7 +11,6 @@
       - Ratings
     #TeamCity
     tc_server: "https://teamcity.brokeree.dev"
-    tc_build_type_id: "PAMM_NewDesign"
     tc_token: "eyJ0eXAiOiAiVENWMiJ9.bk9YX3RsWnVudS1GQjFxeU5KNFVyQm9tV1Js.NTdiZDRjY2UtNzkxNC00YzFjLWE3ODUtYWNlYTkzMTI2OTVh"
     
   tasks:
@@ -103,7 +102,7 @@
 
     - name: Download artifacts from TeamCity
       ansible.windows.win_get_url:
-        url: "{{ tc_server }}/repository/downloadAll/{{ tc_build_type_id }}/{{ tc_build_id }}:id"
+        url: "{{ tc_server }}/repository/downloadAll/{{ tc_build_configuration_id }}/{{ tc_build_id }}:id"
         headers:
           Authorization: "Bearer {{ tc_token }}"
         dest: "{{ pamm_path }}\\_update\\{{ backup_file }}\\PAMM.zip"
