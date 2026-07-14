@@ -78,12 +78,14 @@
         script: |
           # Generate a back file name
           $backupFile = "{{ pamm_path }}\_backup\{{ backup_file }}\{{ mysql_db_name }}_{{ backup_file }}.sql"
+          $backupFile2 = "{{ social_path }}\_backup\{{ date_var }}\{{ mysql_db_name }}_ratings_module_{{ date_var }}.sql"
           
           # Navigate to MySQL bin directory
           cd "{{ mysql_bin_path }}"
           
           # Execute mysqldump
           ./mysqldump.exe --user="{{ mysql_user }}" --password="{{ mysql_password }}" {{ mysql_db_name }} --result-file=$backupFile
+          ./mysqldump.exe --user="{{ mysql_user }}" --password="{{ mysql_password }}" {{ mysql_db_name }}_ratings_module --result-file=$backupFile2
           
           # Verify file was created and isn't empty
           if (Test-Path $backupFile) {
