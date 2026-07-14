@@ -4,15 +4,12 @@
   gather_facts: false
   vars:
     #Application settings
-    date_var: "{{ lookup('pipe','date +%Y-%m-%d-%H%M') }}"
-    backup_file: "{{ date_var }}"
+    backup_file: "{{ lookup('pipe','date +%Y-%m-%d') }}-{{ tc_build_id }}"
     services:
       - Core
       - Web
       - Ratings
-    pamm_path2: "C:\\Brokeree\\Brokeree.PAMM-2"
     #TeamCity
-    target_branch: "epic/PAMM-2739"
     tc_server: "https://teamcity.brokeree.dev"
     tc_build_type_id: "PAMM"
     tc_token: "eyJ0eXAiOiAiVENWMiJ9.bk9YX3RsWnVudS1GQjFxeU5KNFVyQm9tV1Js.NTdiZDRjY2UtNzkxNC00YzFjLWE3ODUtYWNlYTkzMTI2OTVh"
@@ -65,9 +62,9 @@
         - { source_file: 'PAMM.API.xml', backup_file: 'PAMM.API.xml' }
         - { source_file: 'PAMM.Model.xml', backup_file: 'PAMM.Model.xml' }
         - { source_file: 'PAMM.Web.exe', backup_file: 'PAMM.Web.exe' }
-#        - { source_file: 'wwwadmin.zip', backup_file: 'wwwadmin.zip' }
-#        - { source_file: 'wwwinventory.zip', backup_file: 'wwwinventory.zip' }
-#       - { source_file: 'wwwmanager.zip', backup_file: 'wwwmanager.zip' } 
+        - { source_file: 'wwwadmin.zip', backup_file: 'wwwadmin.zip' }
+        - { source_file: 'wwwinventory.zip', backup_file: 'wwwinventory.zip' }
+        - { source_file: 'wwwmanager.zip', backup_file: 'wwwmanager.zip' } 
 
     - name: Stop PAMM Services
       ansible.windows.win_service:
@@ -97,36 +94,14 @@
           }
       register: mysql_backup_result
 
-    - name: Create update directories
+    - name: Create update directory
       ansible.windows.win_file:
         path: "{{ pamm_path }}\\_update\\{{ backup_file }}"
         state: directory
 
-    - name: Query TeamCity for the build ID
-      ansible.builtin.uri:
-        url: "{{ tc_server }}/app/rest/builds?locator=buildType:{{ tc_build_type_id }},branch:{{ target_branch }},status:SUCCESS,count:1"
-        method: GET
-        headers:
-          Accept: "application/json"
-          Authorization: "Bearer {{ tc_token }}"
-        status_code: 200
-      register: tc_build_response
-      delegate_to: localhost
-
-    - name: Fail if no successful builds are found
-      ansible.builtin.fail:
-        msg: "No successful builds found for branch '{{ target_branch }}'."
-      when: tc_build_response.json.count == 0
-      delegate_to: localhost
-
-    - name: Extract the Build ID
-      ansible.builtin.set_fact:
-        latest_build_id: "{{ tc_build_response.json.build[0].id }}"
-      delegate_to: localhost
-
     - name: Download artifacts from TeamCity
       ansible.windows.win_get_url:
-        url: "{{ tc_server }}/repository/downloadAll/{{ tc_build_type_id }}/{{ latest_build_id }}:id"
+        url: "{{ tc_server }}/repository/downloadAll/{{ tc_build_type_id }}/{{ tc_build_id }}:id"
         headers:
           Authorization: "Bearer {{ tc_token }}"
         dest: "{{ pamm_path }}\\_update\\{{ backup_file }}\\PAMM.zip"
@@ -134,7 +109,7 @@
     - name: Extract the artifact onto the Social directory
       community.windows.win_unzip:
         src: "{{ pamm_path }}\\_update\\{{ backup_file }}\\PAMM.zip"
-        dest: "{{ pamm_path2 }}"
+        dest: "{{ pamm_path }}"
         rm: true 
       
     - name: Starting Social Services
