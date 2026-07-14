@@ -1,0 +1,12 @@
+---
+- name: PAMM Deploy
+  hosts: windows
+  gather_facts: false
+  vars:
+    test_path: "C:\\Tests"
+    
+  tasks:
+    - name: Create backup directories
+      ansible.windows.win_file:
+        path: "{{ pamm_path }}\\test01.txt"
+        state: file
