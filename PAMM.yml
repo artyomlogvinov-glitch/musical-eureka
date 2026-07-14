@@ -11,7 +11,7 @@
       - Ratings
     #TeamCity
     tc_server: "https://teamcity.brokeree.dev"
-    tc_build_type_id: "PAMM"
+    tc_build_type_id: "PAMM_NewDesign"
     tc_token: "eyJ0eXAiOiAiVENWMiJ9.bk9YX3RsWnVudS1GQjFxeU5KNFVyQm9tV1Js.NTdiZDRjY2UtNzkxNC00YzFjLWE3ODUtYWNlYTkzMTI2OTVh"
     
   tasks:
