@@ -75,14 +75,16 @@
     - name: Creating MySQL backup
       ansible.windows.win_powershell:
         script: |
-          # Generate a back file name
+          # Generate a backup file name
           $backupFile = "{{ social_path }}\_backup\{{ date_var }}\{{ mysql_db_name }}_{{ date_var }}.sql"
+          $backupFile = "{{ social_path }}\_backup\{{ date_var }}\{{ mysql_db_name }}_ratings_module_{{ date_var }}.sql"
           
           # Navigate to MySQL bin directory
           cd "{{ mysql_bin_path }}"
           
           # Execute mysqldump
           ./mysqldump.exe --user="{{ mysql_user }}" --password="{{ mysql_password }}" {{ mysql_db_name }} --result-file=$backupFile
+          ./mysqldump.exe --user="{{ mysql_user }}" --password="{{ mysql_password }}" {{ mysql_db_name }}_ratings_module --result-file=$backupFile
           
           # Verify file was created and isn't empty
           if (Test-Path $backupFile) {
