@@ -8,5 +8,5 @@
   tasks:
     - name: Create backup directories
       ansible.windows.win_file:
-        path: "{{ pamm_path }}\\test02.txt"
+        path: "{{ test_path }}\\test02.txt"
         state: file
