@@ -10,9 +10,3 @@
       ansible.windows.win_file:
         path: "{{ test_path }}\\test01-{{ name_dir }}"
         state: directory
-
-    - name: Copy file
-      ansible.windows.win_copy:
-        src: "{{ test_path }}\\1.txt"
-        dest: "{{ test_path }}\\test01-{{ name_dir }}\\1.txt"
-        remote_src: true
