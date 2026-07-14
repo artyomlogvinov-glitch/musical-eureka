@@ -78,7 +78,7 @@
         script: |
           # Generate a back file name
           $backupFile = "{{ pamm_path }}\_backup\{{ backup_file }}\{{ mysql_db_name }}_{{ backup_file }}.sql"
-          $backupFile2 = "{{ social_path }}\_backup\{{ date_var }}\{{ mysql_db_name }}_ratings_module_{{ date_var }}.sql"
+          $backupFile2 = "{{ pamm_path }}\_backup\{{ date_var }}\{{ mysql_db_name }}_ratings_module_{{ date_var }}.sql"
           
           # Navigate to MySQL bin directory
           cd "{{ mysql_bin_path }}"
