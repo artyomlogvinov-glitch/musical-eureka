@@ -3,16 +3,27 @@
   hosts: windows
   gather_facts: false
   vars:
-    #Application settings
+    # Application settings
     backup_file: "{{ lookup('pipe','date +%Y-%m-%d') }}-{{ tc_build_id }}"
     services:
       - Core
       - Web
       - Ratings
-    #TeamCity
+    # TeamCity
     tc_server: "https://teamcity.brokeree.dev"
     tc_token: "eyJ0eXAiOiAiVENWMiJ9.bk9YX3RsWnVudS1GQjFxeU5KNFVyQm9tV1Js.NTdiZDRjY2UtNzkxNC00YzFjLWE3ODUtYWNlYTkzMTI2OTVh"
-    
+
+    # Variables on Task Start
+    # tc_build_configuration_id
+    # tc_build_id
+
+    # Variables from Variable Groups:
+    # pamm_path
+    # pamm_service
+    # mysql_user
+    # mysql_password
+    # mysql_db_name
+    # mysql_bin_path
   tasks:
     - name: Create backup directories
       ansible.windows.win_file:
