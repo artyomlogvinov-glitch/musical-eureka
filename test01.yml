@@ -18,15 +18,3 @@
     - name: Inspect target Semaphore URL
       ansible.builtin.debug:
         msg: "Targeting URL: https://semaphore.brokeree.dev/api/project/1/tasks/{{ semaphore_vars.task_details.id }}"
-
-    - name: Update Version Column via Semaphore API
-      ansible.builtin.uri:
-        url: "https://semaphore.brokeree.dev/api/project/1/tasks/{{ semaphore_vars.task_details.id }}"
-        method: PUT
-        headers:
-          Authorization: "Bearer nxqnjrtjgkijz2_tbtghrhzzqp0_lddubjyheqwxug0="
-          Content-Type: "application/json"
-        body_format: json
-        body:
-          version: "{{ vtest }}"
-      delegate_to: localhost
