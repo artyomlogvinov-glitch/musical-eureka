@@ -1,11 +1,30 @@
 ---
 - name: testing
   hosts: windows
-  gather_facts: false
+  gather_facts: true
   vars:
     test_path: "C:\\Tests"
     
   tasks:
+    - name: Display Task and Template IDs
+        ansible.builtin.debug:
+          msg:
+            - "Current Task ID: {{ semaphore_vars.task_details.id }}"
+            - "Task Template ID: {{ semaphore_vars.task_details.template_id }}"
+            - "Project ID: {{ semaphore_vars.task_details.project_id }}"
+            - "Triggered By User: {{ semaphore_vars.task_details.username }}"
+            
+    - name: Changin task version
+      ansible.builtin.uri:
+        url: "https://semaphore.brokeree.dev/api/project/{{ semaphore_vars.task_details.project_id }}/templates/{{ semaphore_vars.task_details.template_id }}"
+        method: PUT
+        headers:
+          Authorization: "Bearer {{ semaphore_api_token }}"
+          Content-Type: "application/json"
+        body_format: json
+        body:
+          start_version: "{{ vtest }}"
+        
     - name: Create directories
       ansible.windows.win_file:
         path: "{{ test_path }}\\test01-{{ name_dir }}"
