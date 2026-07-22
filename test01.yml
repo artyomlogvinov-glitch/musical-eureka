@@ -23,5 +23,6 @@
           Authorization: "Bearer nxqnjrtjgkijz2_tbtghrhzzqp0_lddubjyheqwxug0="
           Content-Type: "application/json"
         body_format: json
-        body: '{ "version": "{{ vtest }}" }'
+        body:  
+          version: "{{ vtest }}"
         delegate_to: localhost
