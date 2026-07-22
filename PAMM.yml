@@ -29,9 +29,9 @@
     - name: Build details
       ansible.builtin.debug:
         msg:
-          - "Build Configuration ID: {{ tc_build_configuration_id }}"
-      #    - "Build Branch: {{ tc_build_branch }}"
-          - "Build ID: {{ tc_build_id }}"
+          - "{{ tc_build_configuration_id }}"
+      #    - "{{ tc_build_branch }}"
+          - "{{ tc_build_id }}"
     
     - name: Create backup directories
       ansible.windows.win_file:
