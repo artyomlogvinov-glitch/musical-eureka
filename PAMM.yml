@@ -30,7 +30,7 @@
       ansible.builtin.debug:
         msg:
           - "Build Configuration ID: {{ tc_build_configuration_id }}"
-          - "Build Branch: {{ tc_build_branch }}"
+      #    - "Build Branch: {{ tc_build_branch }}"
           - "Build ID: {{ tc_build_id }}"
     
     - name: Create backup directories
