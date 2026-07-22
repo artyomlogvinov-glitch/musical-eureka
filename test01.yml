@@ -7,12 +7,12 @@
     
   tasks:
     - name: Display Task and Template IDs
-        ansible.builtin.debug:
-          msg:
-            - "Current Task ID: {{ semaphore_vars.task_details.id }}"
-            - "Task Template ID: {{ semaphore_vars.task_details.template_id }}"
-            - "Project ID: {{ semaphore_vars.task_details.project_id }}"
-            - "Triggered By User: {{ semaphore_vars.task_details.username }}"
+      ansible.builtin.debug:
+        msg:
+          - "Current Task ID: {{ semaphore_vars.task_details.id }}"
+          - "Task Template ID: {{ semaphore_vars.task_details.template_id }}"
+          - "Project ID: {{ semaphore_vars.task_details.project_id }}"
+          - "Triggered By User: {{ semaphore_vars.task_details.username }}"
             
     - name: Changin task version
       ansible.builtin.uri:
