@@ -9,17 +9,6 @@
     - name: Dump available task details
       ansible.builtin.debug:
         var: semaphore_vars.task_details
-            
-    - name: Changin task version
-      ansible.builtin.uri:
-        url: "https://semaphore.brokeree.dev/api/project/{{ semaphore_vars.task_details.project_id }}/templates/{{ semaphore_vars.task_details.template_id }}"
-        method: PUT
-        headers:
-          Authorization: "Bearer {{ semaphore_api_token }}"
-          Content-Type: "application/json"
-        body_format: json
-        body:
-          start_version: "{{ vtest }}"
         
     - name: Create directories
       ansible.windows.win_file:
