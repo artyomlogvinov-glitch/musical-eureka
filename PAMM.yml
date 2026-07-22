@@ -15,6 +15,7 @@
 
     # Variables on Task Start
     # tc_build_configuration_id
+    # tc_build_branch
     # tc_build_id
 
     # Variables from Variable Groups:
@@ -25,6 +26,13 @@
     # mysql_db_name
     # mysql_bin_path
   tasks:
+    - name: Build details
+      ansible.builtin.debug:
+        msg:
+          - "Build Configuration ID: {{ tc_build_configuration_id }}"
+          - "Build Branch: {{ tc_build_branch }}"
+          - "Build ID: {{ tc_build_id }}"
+    
     - name: Create backup directories
       ansible.windows.win_file:
         path: "{{ pamm_path }}\\_backup\\{{ backup_file }}\\{{ item.pamm_file }}"
@@ -124,7 +132,7 @@
         dest: "{{ pamm_path }}"
         rm: true 
       
-    - name: Starting Social Services
+    - name: Starting PAMM Services
       ansible.windows.win_service:
         name: "{{ pamm_service }}.{{ item }}"
         state: started
