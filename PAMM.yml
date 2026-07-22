@@ -4,7 +4,7 @@
   gather_facts: false
   vars:
     # Application settings
-    backup_file: "{{ lookup('pipe','date +%Y-%m-%d') }}-{{ semaphore_vars.task_details.id }}"
+    backup_file: "{{ lookup('pipe','date +%Y-%m-%d') }} {{ semaphore_vars.task_details.id }}"
     services:
       - Core
       - Web
