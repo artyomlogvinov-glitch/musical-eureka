@@ -14,6 +14,7 @@
     tc_token: "eyJ0eXAiOiAiVENWMiJ9.bk9YX3RsWnVudS1GQjFxeU5KNFVyQm9tV1Js.NTdiZDRjY2UtNzkxNC00YzFjLWE3ODUtYWNlYTkzMTI2OTVh"
 
     # Variables on Task Start
+    # tc_version
     # tc_build_configuration_id
     # tc_build_branch
     # tc_build_id
@@ -29,8 +30,9 @@
     - name: Build details
       ansible.builtin.debug:
         msg:
+          - "{{ tc_version }}"
           - "{{ tc_build_configuration_id }}"
-      #    - "{{ tc_build_branch }}"
+          - "{{ tc_build_branch }}"
           - "{{ tc_build_id }}"
     
     - name: Create backup directories
