@@ -10,8 +10,7 @@
       - Web
       - Ratings
     # TeamCity
-    tc_server: "https://teamcity.brokeree.dev"
-   
+    tc_server: "https://teamcity.brokeree.dev"   
 
     # Variables on Task Start
     # tc_version
