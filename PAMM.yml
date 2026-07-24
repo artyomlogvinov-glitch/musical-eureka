@@ -35,6 +35,7 @@
           - "{{ tc_build_configuration_id }}"
           - "{{ tc_build_branch }}"
           - "{{ tc_build_id }}"
+          - "{{ tc_artifactsDirectory }}"
     
     - name: Create backup directories
       ansible.windows.win_file:
