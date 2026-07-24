@@ -140,4 +140,5 @@
         name: "{{ pamm_service }}.{{ item }}"
         state: started
         start_mode: delayed
+      ignore_errors: true
       loop: "{{ services }}"
