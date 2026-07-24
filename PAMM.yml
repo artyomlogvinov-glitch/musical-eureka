@@ -10,7 +10,8 @@
       - Web
       - Ratings
     # TeamCity
-    tc_server: "https://teamcity.brokeree.dev"   
+    # tc_server: "https://teamcity.brokeree.dev"   
+    # tc_token
 
     # Variables on Task Start
     # tc_version
@@ -26,8 +27,6 @@
     # mysql_db_name
     # mysql_bin_path
 
-    # Secrets
-    # tc_token
   tasks:
     - name: Build details
       ansible.builtin.debug:
