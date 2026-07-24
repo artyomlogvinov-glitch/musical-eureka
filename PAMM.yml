@@ -127,7 +127,7 @@
         url: "{{ tc_server }}/repository/download/{{ tc_build_configuration_id }}/{{ tc_build_id }}:id/Brokeree.PAMM-{{ tc_version | urlencode }}.zip"
         headers:
           Authorization: "Bearer {{ tc_token }}"
-        dest: "{{ pamm_path }}\\_update\\{{ backup_file }}\\Brokeree.PAMM-{{ tc_version }}.zip"
+        dest: "{{ pamm_path }}\\_update\\{{ backup_file }}\\PAMM.zip"
 
     - name: Extract the artifact onto the Social directory
       community.windows.win_unzip:
