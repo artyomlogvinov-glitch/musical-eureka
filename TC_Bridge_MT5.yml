@@ -1,0 +1,175 @@
+---
+- name: Bridge Deploy
+  hosts: windows
+  gather_facts: false
+  vars:
+    # Application settings
+    backup_file: "{{ lookup('pipe','date +%Y-%m-%d') }} {{ semaphore_vars.task_details.id }}"
+    services:
+      - API
+      - Core
+    ## TeamCity
+    # tc_server  
+    # tc_token
+
+    ## Variables on Task Start
+    # tc_version
+    # tc_build_configuration_id
+    # tc_build_branch
+    # tc_build_id
+
+    ## Variables from Variable Groups:    
+    # application_path
+    # application_service
+    # mt_history_path
+    # mt_history_service
+    # mysql_user
+    # mysql_password
+    # mysql_db_name
+    # mysql_bin_path
+    
+  tasks:
+    - name: Build details
+      ansible.builtin.debug:
+        msg:
+          - "{{ tc_version }}"
+          - "{{ tc_build_configuration_id }}"
+          - "{{ tc_build_branch }}"
+          - "{{ tc_build_id }}"
+    
+    - name: Create backup directories
+      ansible.windows.win_file:
+        path: "{{ application_path }}\\_backup\\{{ backup_file }}\\{{ item.bridge_file }}"
+        state: directory
+      loop:
+        - { bridge_file: "Bridge.API" }
+        - { bridge_file: "Bridge.Core" }
+        - { bridge_file: "Gateway.MT5" }
+        
+    - name: Bridge.API Backup
+      ansible.windows.win_copy:
+        src: "{{ application_path }}\\PAMM\\{{ item.source_file }}"
+        dest: "{{ application_path }}\\_backup\\{{ backup_file }}\\PAMM"
+        remote_src: true
+      loop:
+        - { source_file: 'OpenAPI', backup_file: '' }
+        - { source_file: 'wwwroot.zip', backup_file: 'wwwroot.zip' }
+        - { source_file: 'Bridge.API.exe', backup_file: 'Bridge.API.exe' }
+        - { source_file: 'Bridge.API.staticwebassets.endpoints.json', backup_file: 'Bridge.API.staticwebassets.endpoints.json' }
+        - { source_file: 'NLog.config', backup_file: 'MNLog.config' }
+        - { source_file: 'web.config', backup_file: 'web.config' }
+        
+    - name: Bridge.Core Backup
+      ansible.windows.win_copy:
+        src: "{{ application_path }}\\PAMM.Ratings\\{{ item.source_file }}"
+        dest: "{{ application_path }}\\_backup\\{{ backup_file }}\\PAMM.Ratings"
+        remote_src: true
+      loop:
+        - { source_file: 'Bridge.Core.exe', backup_file: 'Bridge.Core.exe' }
+        - { source_file: 'Bridge.Core.staticwebassets.endpoints.json', backup_file: 'Bridge.Core.staticwebassets.endpoints.json' }
+        - { source_file: 'DxFeedGraalNativeSdk.dll', backup_file: 'DxFeedGraalNativeSdk.dll' }
+        - { source_file: 'Epam.FixAntenna.Dialects.dll', backup_file: 'Epam.FixAntenna.Dialects.dll' }
+        - { source_file: 'Epam.FixAntenna.NetCore.dll', backup_file: 'Epam.FixAntenna.NetCore.dll' }
+        - { source_file: 'FIX44.xml', backup_file: 'FIX44.xml' }
+        - { source_file: 'fixengine.properties', backup_file: 'fixengine.properties' }
+        - { source_file: 'NLog.config', backup_file: 'MNLog.config' }
+        - { source_file: 'Providers.TestProvider.pdb', backup_file: 'Providers.TestProvider.pdb' }
+        - { source_file: 'web.config', backup_file: 'web.config' }
+
+    - name: Gateway.MT5 Backup
+      ansible.windows.win_copy:
+        src: "{{ mt_history_path }}\\Gateway\\Gateway.MT5\\{{ item.source_file }}"
+        dest: "{{ application_path }}\\_backup\\{{ backup_file }}\\Gateway.MT5"
+        remote_src: true
+      loop:
+        - { source_file: 'Brokeree.Bridge.GW.MT5.exe', backup_file: 'Brokeree.Bridge.GW.MT5.exe' }
+        - { source_file: 'Brokeree.MT5GatewayAPI.Native.dll', backup_file: 'Brokeree.MT5GatewayAPI.Native.dll' }
+        - { source_file: 'Brokeree.MT5ManagerAPI.Native.dll', backup_file: 'Brokeree.MT5ManagerAPI.Native.dll' }
+        - { source_file: 'MT5APIGateway64.dll', backup_file: 'MT5APIGateway64.dll' }
+        - { source_file: 'MT5APIGateway64avx.dll', backup_file: 'MT5APIGateway64avx.dll' }
+        - { source_file: 'MT5APIGateway64avx2.dll', backup_file: 'MT5APIGateway64avx2.dll' }
+        - { source_file: 'MT5APIManager64.dll', backup_file: 'MT5APIManager64.dll' }
+        - { source_file: 'MT5APIManager64avx.dll', backup_file: 'MT5APIManager64avx.dll' }
+        - { source_file: 'MT5APIManager64avx2.dll', backup_file: 'MT5APIManager64avx2.dll' }
+        - { source_file: 'NLog.config', backup_file: 'NLog.config' }
+
+    - name: Stop Bridge Services
+      ansible.windows.win_service:
+        name: "{{ application_service }}.{{ item }}"
+        state: stopped
+        start_mode: manual
+      loop: "{{ services }}"
+
+    - name: Stop MT5 History Services
+      ansible.windows.win_service:
+        name: "{{ mt_history_service }}"
+        state: stopped
+        start_mode: manual    
+      
+    - name: Creating MySQL backup
+      ansible.windows.win_powershell:
+        script: |
+          # Generate a back file name
+          $backupFile = "{{ application_path }}\_backup\{{ backup_file }}\{{ mysql_db_name }}_{{ backup_file }}.sql"
+          
+          # Navigate to MySQL bin directory
+          cd "{{ mysql_bin_path }}"
+          
+          # Execute mysqldump
+          ./mysqldump.exe --user="{{ mysql_user }}" --password="{{ mysql_password }}" {{ mysql_db_name }} --result-file=$backupFile
+          
+          # Verify file was created and isn't empty
+          if (Test-Path $backupFile) {
+              $size = (Get-Item $backupFile).Length
+              return @{ backup_path = $backupFile; size_bytes = $size; success = $true }
+          } else {
+              throw "Mysqldump failed to create the backup file."
+          }
+      register: mysql_backup_result
+
+    - name: Create update directory
+      ansible.windows.win_file:
+        path: "{{ application_path }}\\_update\\{{ backup_file }}"
+        state: directory
+
+    - name: Download artifacts from TeamCity
+      ansible.windows.win_get_url:
+        url: "{{ tc_server }}/repository/download/{{ tc_build_configuration_id }}/{{ tc_build_id }}:id/Brokeree.PAMM-{{ tc_version | urlencode }}.zip"
+        headers:
+          Authorization: "Bearer {{ tc_token }}"
+        dest: "{{ application_path }}\\_update\\{{ backup_file }}\\Bridge.zip"
+
+    - name: Unarchive artifacts
+      community.windows.win_unzip:
+        src: "{{ application_path }}\\_update\\{{ backup_file }}\\Bridge.zip"
+        dest: "{{ application_path }}\\_update\\{{ backup_file }}"
+        rm: true 
+
+    - name: Update Bridge
+      ansible.windows.win_copy:
+        src: "{{ application_path }}\\_update\\{{ backup_file }}\\{{ item.source_file }}"
+        dest: "{{ application_path }}"
+        remote_src: true
+      loop:
+        - { source_file: 'Bridge.API', backup_file: '' }
+        - { source_file: 'Bridge.Core', backup_file: '' }
+
+    - name: Update Gateway
+      ansible.windows.win_copy:
+        src: "{{ application_path }}\\_update\\{{ backup_file }}\\Gateway.MT5"
+        dest: "{{ mt_history_path }}\\Gateway"
+        remote_src: true
+        
+    - name: Starting Bridge Services
+      ansible.windows.win_service:
+        name: "{{ application_service }}.{{ item }}"
+        state: started
+        start_mode: delayed
+      ignore_errors: true
+      loop: "{{ services }}"
+
+    - name: Starting MT5 History Services
+      ansible.windows.win_service:
+        name: "{{ mt_history_service }}"
+        state: started
+        start_mode: delayed 
