@@ -154,3 +154,8 @@
         name: "{{ mt_history_service }}"
         state: started
         start_mode: delayed 
+
+    - name: Deleting update folder
+      ansible.windows.win_file:
+        path: "{{ app_path }}\\_update"
+        state: absent
