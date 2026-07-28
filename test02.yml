@@ -11,3 +11,4 @@
         src: "{{ test_path }}\\test01\\"
         dest: "{{ test_path }}\\test02"
         remote_src: true
+        force: true
