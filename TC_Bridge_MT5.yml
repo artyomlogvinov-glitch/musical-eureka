@@ -49,7 +49,7 @@
     - name: Bridge.API Backup
       ansible.windows.win_copy:
         src: "{{ app_path }}\\Bridge.API\\{{ item.source_file }}"
-        dest: "{{ app_path }}\\_backup\\{{ task_file }}\\PAMM"
+        dest: "{{ app_path }}\\_backup\\{{ task_file }}\\Bridge.API"
         remote_src: true
       loop:
         - { source_file: 'OpenAPI', task_file: '' }
@@ -62,7 +62,7 @@
     - name: Bridge.Core Backup
       ansible.windows.win_copy:
         src: "{{ app_path }}\\Bridge.Core\\{{ item.source_file }}"
-        dest: "{{ app_path }}\\_backup\\{{ task_file }}\\PAMM.Ratings"
+        dest: "{{ app_path }}\\_backup\\{{ task_file }}\\Bridge.Core"
         remote_src: true
       loop:
         - { source_file: 'Bridge.Core.exe', task_file: 'Bridge.Core.exe' }
@@ -132,17 +132,26 @@
         url: "{{ tc_server }}/repository/download/{{ tc_build_configuration_id }}/{{ tc_build_id }}:id/Brokeree.PAMM-{{ tc_version | urlencode }}.zip"
         headers:
           Authorization: "Bearer {{ tc_token }}"
-        dest: "{{ app_path }}\\_update\\{{ task_file }}\\Bridge.zip"
+        dest: "{{ app_path }}\\_update\\Bridge.zip"
+
+    - name: Unarchiving
+      community.windows.win_unzip:
+        src: "{{ app_path }}\\_update\\Bridge.zip"
+        dest: "{{ app_path }}\\_update"
+        rm: true 
 
     - name: Update Bridge
-      community.windows.win_unzip:
-        src: "{{ app_path }}\\_update\\{{ task_file }}\\Bridge.zip"
-        dest: "{{ app_path }}"
-        rm: true 
+      ansible.windows.win_copy:
+        src: "{{ app_path }}\\_update\\Brokeree.Bridge\\{{ item.bridge_file }}\\"
+        dest: "{{ app_path }}\\{{ item.bridge_file }}"
+        remote_src: true
+      loop:
+        - { bridge_file: "Bridge.API" }
+        - { bridge_file: "Bridge.Core" }
 
     - name: Update Gateway
       ansible.windows.win_copy:
-        src: "{{ app_path }}\\Gateway.MT5\\"
+        src: "{{ app_path }}\\_update\\Brokeree.Bridge\\Gateway.MT5\\"
         dest: "{{ mt_history_path }}\\Gateway\\Gateway.MT5"
         remote_src: true
         
@@ -159,3 +168,8 @@
         name: "{{ mt_history_service }}"
         state: started
         start_mode: delayed 
+
+    - name: Deleting update folder
+      ansible.windows.win_file:
+        path: "{{ app_path }}\\_update"
+        state: absent
