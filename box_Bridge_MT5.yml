@@ -115,12 +115,12 @@
         path: "{{ app_path }}\\_update\\{{ task_file }}"
         state: directory
 
-    - name: Download artifacts from Box
+    - name: Download archive from Box
       ansible.windows.win_get_url:
         url: "{{ download_link }}"
         dest: "{{ app_path }}\\_update\\{{ task_file }}\\Bridge.zip"
 
-    - name: Unarchive artifacts
+    - name: Update Bridge
       community.windows.win_unzip:
         src: "{{ app_path }}\\_update\\{{ task_file }}\\Bridge.zip"
         dest: "{{ app_path }}"
