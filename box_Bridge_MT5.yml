@@ -128,7 +128,7 @@
 
     - name: Update Bridge
       ansible.windows.win_copy:
-        src: "{{ app_path }}\\_update\\{{ task_file }}\\{{ item.source_file }}"
+        src: "{{ app_path }}\\_update\\{{ task_file }}\\Brokeree.Bridge\\{{ item.source_file }}"
         dest: "{{ app_path }}"
         remote_src: true
       loop:
@@ -137,7 +137,7 @@
 
     - name: Update Gateway
       ansible.windows.win_copy:
-        src: "{{ app_path }}\\_update\\{{ task_file }}\\Gateway.MT5"
+        src: "{{ app_path }}\\_update\\{{ task_file }}\\Brokeree.Bridge\\Gateway.MT5"
         dest: "{{ mt_history_path }}\\Gateway"
         remote_src: true
         
