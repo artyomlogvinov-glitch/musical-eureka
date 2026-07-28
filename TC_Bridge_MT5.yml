@@ -106,26 +106,21 @@
         state: stopped
         start_mode: manual    
       
-    - name: Creating MySQL backup
+    - name: Set backup file path variable
+      ansible.builtin.set_fact:
+        backup_file: "{{ app_path }}\\_backup\\{{ task_file }}\\{{ pg_db_name }}.backup"
+      
+    - name: Run pg_dump to create database backup
       ansible.windows.win_powershell:
         script: |
-          # Generate a back file name
-          $backupFile = "{{ app_path }}\_backup\{{ task_file }}\{{ mysql_db_name }}_{{ task_file }}.sql"
-          
-          # Navigate to MySQL bin directory
-          cd "{{ mysql_bin_path }}"
-          
-          # Execute mysqldump
-          ./mysqldump.exe --user="{{ mysql_user }}" --password="{{ mysql_password }}" {{ mysql_db_name }} --result-file=$backupFile
-          
-          # Verify file was created and isn't empty
-          if (Test-Path $backupFile) {
-              $size = (Get-Item $backupFile).Length
-              return @{ backup_path = $backupFile; size_bytes = $size; success = $true }
-          } else {
-              throw "Mysqldump failed to create the backup file."
-          }
-      register: mysql_backup_result
+          $env:PGPASSWORD = "{{ pg_password }}"
+          & "{{ pg_bin_path }}\pg_dump.exe" --host="{{ pg_host }}" --port="{{ pg_port }}" --username="{{ pg_user }}" --format=custom --file="{{ backup_file }}" "{{ pg_db_name }}"
+      no_log: true
+
+    - name: Verify backup file creation
+      ansible.windows.win_stat:
+        path: "{{ backup_file }}"
+      register: backup_stat
 
     - name: Create update directory
       ansible.windows.win_file:
@@ -139,25 +134,16 @@
           Authorization: "Bearer {{ tc_token }}"
         dest: "{{ app_path }}\\_update\\{{ task_file }}\\Bridge.zip"
 
-    - name: Unarchive artifacts
+    - name: Update Bridge
       community.windows.win_unzip:
         src: "{{ app_path }}\\_update\\{{ task_file }}\\Bridge.zip"
-        dest: "{{ app_path }}\\_update\\{{ task_file }}"
-        rm: true 
-
-    - name: Update Bridge
-      ansible.windows.win_copy:
-        src: "{{ app_path }}\\_update\\{{ task_file }}\\{{ item.source_file }}"
         dest: "{{ app_path }}"
-        remote_src: true
-      loop:
-        - { source_file: 'Bridge.API', task_file: '' }
-        - { source_file: 'Bridge.Core', task_file: '' }
+        rm: true 
 
     - name: Update Gateway
       ansible.windows.win_copy:
-        src: "{{ app_path }}\\_update\\{{ task_file }}\\Gateway.MT5"
-        dest: "{{ mt_history_path }}\\Gateway"
+        src: "{{ app_path }}\\Gateway.MT5\\"
+        dest: "{{ mt_history_path }}\\Gateway\\Gateway.MT5"
         remote_src: true
         
     - name: Starting Bridge Services
