@@ -123,22 +123,13 @@
     - name: Unarchive artifacts
       community.windows.win_unzip:
         src: "{{ app_path }}\\_update\\{{ task_file }}\\Bridge.zip"
-        dest: "{{ app_path }}\\_update\\{{ task_file }}"
-        rm: true 
-
-    - name: Update Bridge
-      ansible.windows.win_copy:
-        src: "{{ app_path }}\\_update\\{{ task_file }}\\Brokeree.Bridge\\{{ item.source_file }}"
         dest: "{{ app_path }}"
-        remote_src: true
-      loop:
-        - { source_file: 'Bridge.API', task_file: '' }
-        - { source_file: 'Bridge.Core', task_file: '' }
+        rm: true 
 
     - name: Update Gateway
       ansible.windows.win_copy:
-        src: "{{ app_path }}\\_update\\{{ task_file }}\\Brokeree.Bridge\\Gateway.MT5"
-        dest: "{{ mt_history_path }}\\Gateway"
+        src: "{{ app_path }}\\Gateway.MT5"
+        dest: "{{ mt_history_path }}\\Gateway\\Gateway.MT5"
         remote_src: true
         
     - name: Starting Bridge Services
