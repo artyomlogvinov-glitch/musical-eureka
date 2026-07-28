@@ -121,11 +121,21 @@
         url: "{{ download_link }}"
         dest: "{{ app_path }}\\_update\\PAMM.zip"
 
-    - name: Extract the artifact onto the Social directory
+    - name: Unarchiving the artefacts
       community.windows.win_unzip:
-        src: "{{ app_path }}\\_update\\{{ task_file }}\\PAMM.zip"
-        dest: "{{ app_path }}"
-        rm: true 
+        src: "{{ app_path }}\\_update\\PAMM.zip"
+        dest: "{{ app_path }}\\_update"
+        rm: true
+
+    - name: Update PAMM
+      ansible.windows.win_copy:
+        src: "{{ app_path }}\\_update\\Brokeree.PAMM\\{{ item.app_file }}\\"
+        dest: "{{ app_path }}\\{{ item.app_file }}"
+        remote_src: true
+      loop:
+        - { app_file: "PAMM" }
+        - { app_file: "PAMM.Web" }
+        - { app_file: "PAMM.Ratings" }
       
     - name: Starting PAMM Services
       ansible.windows.win_service:
@@ -134,3 +144,8 @@
         start_mode: delayed
       ignore_errors: true
       loop: "{{ services }}"
+
+    - name: Deleting update folder
+      ansible.windows.win_file:
+        path: "{{ app_path }}\\_update"
+        state: absent
