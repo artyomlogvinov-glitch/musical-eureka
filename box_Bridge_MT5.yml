@@ -10,7 +10,7 @@
       - Core
 
     ## Variables on Task Start
-    # box_link
+    # download_link
 
     ## Variables from Variable Groups:    
     # app_path
@@ -120,7 +120,7 @@
 
     - name: Download artifacts from Box
       ansible.windows.win_get_url:
-        url: "{{ box_link }}"
+        url: "{{ download_link }}"
         dest: "{{ app_path }}\\_update\\{{ task_file }}\\Bridge.zip"
 
     - name: Unarchive artifacts
