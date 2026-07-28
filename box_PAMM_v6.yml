@@ -9,15 +9,9 @@
       - Core
       - Web
       - Ratings
-    # TeamCity
-    # tc_server  
-    # tc_token
 
     # Variables on Task Start
-    # tc_version
-    # tc_build_configuration_id
-    # tc_build_branch
-    # tc_build_id
+    # download_link
 
     # Variables from Variable Groups:
     # app_path
@@ -122,12 +116,10 @@
         path: "{{ app_path }}\\_update\\{{ task_file }}"
         state: directory
 
-    - name: Download artifacts from TeamCity
+    - name: Download archive from Box
       ansible.windows.win_get_url:
-        url: "{{ tc_server }}/repository/download/{{ tc_build_configuration_id }}/{{ tc_build_id }}:id/Brokeree.PAMM-{{ tc_version | urlencode }}.zip"
-        headers:
-          Authorization: "Bearer {{ tc_token }}"
-        dest: "{{ app_path }}\\_update\\{{ task_file }}\\PAMM.zip"
+        url: "{{ download_link }}"
+        dest: "{{ app_path }}\\_update\\PAMM.zip"
 
     - name: Extract the artifact onto the Social directory
       community.windows.win_unzip:
