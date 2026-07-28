@@ -50,7 +50,7 @@
     - name: Bridge.Core Backup
       ansible.windows.win_copy:
         src: "{{ app_path }}\\Bridge.Core\\{{ item.source_file }}"
-        dest: "{{ app_path }}\\_backup\\{{ task_file }}\\PAMM.Ratings"
+        dest: "{{ app_path }}\\_backup\\{{ task_file }}\\Bridge.Core"
         remote_src: true
       loop:
         - { source_file: 'Bridge.Core.exe', task_file: 'Bridge.Core.exe' }
