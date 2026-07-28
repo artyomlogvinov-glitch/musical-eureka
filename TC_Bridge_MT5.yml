@@ -48,7 +48,7 @@
         
     - name: Bridge.API Backup
       ansible.windows.win_copy:
-        src: "{{ app_path }}\\PAMM\\{{ item.source_file }}"
+        src: "{{ app_path }}\\Bridge.API\\{{ item.source_file }}"
         dest: "{{ app_path }}\\_backup\\{{ task_file }}\\PAMM"
         remote_src: true
       loop:
@@ -61,7 +61,7 @@
         
     - name: Bridge.Core Backup
       ansible.windows.win_copy:
-        src: "{{ app_path }}\\PAMM.Ratings\\{{ item.source_file }}"
+        src: "{{ app_path }}\\Bridge.Core\\{{ item.source_file }}"
         dest: "{{ app_path }}\\_backup\\{{ task_file }}\\PAMM.Ratings"
         remote_src: true
       loop:
