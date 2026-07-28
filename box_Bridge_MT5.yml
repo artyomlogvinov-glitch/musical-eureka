@@ -17,10 +17,12 @@
     # app_service
     # mt_history_path
     # mt_history_service
-    # mysql_user
-    # mysql_password
-    # mysql_db_name
-    # mysql_bin_path
+    # pg_user
+    # pg_password
+    # pg_db_name
+    # pg_bin_path
+    # pg_host
+    # pg_port
     
   tasks:    
     - name: Create backup directories
@@ -34,8 +36,8 @@
         
     - name: Bridge.API Backup
       ansible.windows.win_copy:
-        src: "{{ app_path }}\\PAMM\\{{ item.source_file }}"
-        dest: "{{ app_path }}\\_backup\\{{ task_file }}\\PAMM"
+        src: "{{ app_path }}\\Bridge.API\\{{ item.source_file }}"
+        dest: "{{ app_path }}\\_backup\\{{ task_file }}\\Bridge.API"
         remote_src: true
       loop:
         - { source_file: 'OpenAPI', task_file: '' }
@@ -47,7 +49,7 @@
         
     - name: Bridge.Core Backup
       ansible.windows.win_copy:
-        src: "{{ app_path }}\\PAMM.Ratings\\{{ item.source_file }}"
+        src: "{{ app_path }}\\Bridge.Core\\{{ item.source_file }}"
         dest: "{{ app_path }}\\_backup\\{{ task_file }}\\PAMM.Ratings"
         remote_src: true
       loop:
@@ -91,27 +93,22 @@
         name: "{{ mt_history_service }}"
         state: stopped
         start_mode: manual    
+
+    - name: Set backup file path variable
+      ansible.builtin.set_fact:
+        backup_file: "{{ app_path }}\\_backup\\{{ task_file }}\\{{ pg_db_name }}.backup"
       
-    - name: Creating MySQL backup
+    - name: Run pg_dump to create database backup
       ansible.windows.win_powershell:
         script: |
-          # Generate a back file name
-          $backupFile = "{{ app_path }}\_backup\{{ task_file }}\{{ mysql_db_name }}_{{ task_file }}.sql"
-          
-          # Navigate to MySQL bin directory
-          cd "{{ mysql_bin_path }}"
-          
-          # Execute mysqldump
-          ./mysqldump.exe --user="{{ mysql_user }}" --password="{{ mysql_password }}" {{ mysql_db_name }} --result-file=$backupFile
-          
-          # Verify file was created and isn't empty
-          if (Test-Path $backupFile) {
-              $size = (Get-Item $backupFile).Length
-              return @{ backup_path = $backupFile; size_bytes = $size; success = $true }
-          } else {
-              throw "Mysqldump failed to create the backup file."
-          }
-      register: mysql_backup_result
+          $env:PGPASSWORD = "{{ pg_password }}"
+          & "{{ pg_bin_path }}\pg_dump.exe" --host="{{ pg_host }}" --port="{{ pg_port }}" --username="{{ pg_user }}" --format=custom --file="{{ backup_file }}" "{{ pg_db_name }}"
+      no_log: true
+
+    - name: Verify backup file creation
+      ansible.windows.win_stat:
+        path: "{{ backup_file }}"
+      register: backup_stat
 
     - name: Create update directory
       ansible.windows.win_file:
