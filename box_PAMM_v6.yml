@@ -32,12 +32,12 @@
     
     - name: Create backup directories
       ansible.windows.win_file:
-        path: "{{ app_path }}\\_backup\\{{ task_file }}\\{{ item.pamm_file }}"
+        path: "{{ app_path }}\\_backup\\{{ task_file }}\\{{ item.app_file }}"
         state: directory
       loop:
-        - { pamm_file: "PAMM" }
-        - { pamm_file: "PAMM.Web" }
-        - { pamm_file: "PAMM.Ratings" }
+        - { app_file: "PAMM" }
+        - { app_file: "PAMM.Ratings" }
+        - { app_file: "PAMM.Web" }
         
     - name: Copy PAMM Core
       ansible.windows.win_copy:
@@ -134,8 +134,8 @@
         remote_src: true
       loop:
         - { app_file: "PAMM" }
-        - { app_file: "PAMM.Web" }
         - { app_file: "PAMM.Ratings" }
+        - { app_file: "PAMM.Web" }
       
     - name: Starting PAMM Services
       ansible.windows.win_service:
