@@ -6,7 +6,8 @@
     test_path: "C:\\Tests"
     
   tasks:
-    - name: Create backup directories
-      ansible.windows.win_file:
-        path: "{{ test_path }}\\test02"
-        state: directory
+    - name: Update Gateway
+      ansible.windows.win_copy:
+        src: "{{ test_path }}\\test01\\"
+        dest: "{{ test_path }}\\test02"
+        remote_src: true
