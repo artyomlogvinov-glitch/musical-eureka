@@ -118,13 +118,22 @@
     - name: Download archive from Box
       ansible.windows.win_get_url:
         url: "{{ download_link }}"
-        dest: "{{ app_path }}\\_update\\{{ task_file }}\\Bridge.zip"
+        dest: "{{ app_path }}\\_update\\Bridge.zip"
+
+    - name: Unarchiving
+      community.windows.win_unzip:
+        src: "{{ app_path }}\\_update\\Bridge.zip"
+        dest: "{{ app_path }}\\_update"
+        rm: true 
 
     - name: Update Bridge
-      community.windows.win_unzip:
-        src: "{{ app_path }}\\_update\\{{ task_file }}\\Bridge.zip"
-        dest: "{{ app_path }}"
-        rm: true 
+      ansible.windows.win_copy:
+        src: "{{ app_path }}\\Brokeree.Bridge\\{{ item.bridge_files }}\\"
+        dest: "{{ app_path }}\\{{ item.bridge_files }}"
+        remote_src: true
+      loop:
+        - { bridge_file: "Bridge.API" }
+        - { bridge_file: "Bridge.Core" }
 
     - name: Update Gateway
       ansible.windows.win_copy:
