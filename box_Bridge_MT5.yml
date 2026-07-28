@@ -118,11 +118,11 @@
     - name: Download archive from Box
       ansible.windows.win_get_url:
         url: "{{ download_link }}"
-        dest: "{{ app_path }}\\_update\\Bridge.zip"
+        dest: "{{ app_path }}\\_update\\app.zip"
 
     - name: Unarchiving
       community.windows.win_unzip:
-        src: "{{ app_path }}\\_update\\Bridge.zip"
+        src: "{{ app_path }}\\_update\\app.zip"
         dest: "{{ app_path }}\\_update"
         rm: true 
 
