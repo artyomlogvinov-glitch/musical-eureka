@@ -128,7 +128,7 @@
 
     - name: Update Gateway
       ansible.windows.win_copy:
-        src: "{{ app_path }}\\Gateway.MT5"
+        src: "{{ app_path }}\\Gateway.MT5\\"
         dest: "{{ mt_history_path }}\\Gateway\\Gateway.MT5"
         remote_src: true
         
