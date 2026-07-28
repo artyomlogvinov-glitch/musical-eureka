@@ -4,7 +4,7 @@
   gather_facts: false
   vars:
     # Application settings
-    backup_file: "{{ lookup('pipe','date +%Y-%m-%d') }} {{ semaphore_vars.task_details.id }}"
+    task_file: "{{ lookup('pipe','date +%Y-%m-%d') }} {{ semaphore_vars.task_details.id }}"
     services:
       - API
       - Core
@@ -13,8 +13,8 @@
     # box_link
 
     ## Variables from Variable Groups:    
-    # application_path
-    # application_service
+    # app_path
+    # app_service
     # mt_history_path
     # mt_history_service
     # mysql_user
@@ -25,7 +25,7 @@
   tasks:    
     - name: Create backup directories
       ansible.windows.win_file:
-        path: "{{ application_path }}\\_backup\\{{ backup_file }}\\{{ item.bridge_file }}"
+        path: "{{ app_path }}\\_backup\\{{ task_file }}\\{{ item.bridge_file }}"
         state: directory
       loop:
         - { bridge_file: "Bridge.API" }
@@ -34,54 +34,54 @@
         
     - name: Bridge.API Backup
       ansible.windows.win_copy:
-        src: "{{ application_path }}\\PAMM\\{{ item.source_file }}"
-        dest: "{{ application_path }}\\_backup\\{{ backup_file }}\\PAMM"
+        src: "{{ app_path }}\\PAMM\\{{ item.source_file }}"
+        dest: "{{ app_path }}\\_backup\\{{ task_file }}\\PAMM"
         remote_src: true
       loop:
-        - { source_file: 'OpenAPI', backup_file: '' }
-        - { source_file: 'wwwroot.zip', backup_file: 'wwwroot.zip' }
-        - { source_file: 'Bridge.API.exe', backup_file: 'Bridge.API.exe' }
-        - { source_file: 'Bridge.API.staticwebassets.endpoints.json', backup_file: 'Bridge.API.staticwebassets.endpoints.json' }
-        - { source_file: 'NLog.config', backup_file: 'MNLog.config' }
-        - { source_file: 'web.config', backup_file: 'web.config' }
+        - { source_file: 'OpenAPI', task_file: '' }
+        - { source_file: 'wwwroot.zip', task_file: 'wwwroot.zip' }
+        - { source_file: 'Bridge.API.exe', task_file: 'Bridge.API.exe' }
+        - { source_file: 'Bridge.API.staticwebassets.endpoints.json', task_file: 'Bridge.API.staticwebassets.endpoints.json' }
+        - { source_file: 'NLog.config', task_file: 'MNLog.config' }
+        - { source_file: 'web.config', task_file: 'web.config' }
         
     - name: Bridge.Core Backup
       ansible.windows.win_copy:
-        src: "{{ application_path }}\\PAMM.Ratings\\{{ item.source_file }}"
-        dest: "{{ application_path }}\\_backup\\{{ backup_file }}\\PAMM.Ratings"
+        src: "{{ app_path }}\\PAMM.Ratings\\{{ item.source_file }}"
+        dest: "{{ app_path }}\\_backup\\{{ task_file }}\\PAMM.Ratings"
         remote_src: true
       loop:
-        - { source_file: 'Bridge.Core.exe', backup_file: 'Bridge.Core.exe' }
-        - { source_file: 'Bridge.Core.staticwebassets.endpoints.json', backup_file: 'Bridge.Core.staticwebassets.endpoints.json' }
-        - { source_file: 'DxFeedGraalNativeSdk.dll', backup_file: 'DxFeedGraalNativeSdk.dll' }
-        - { source_file: 'Epam.FixAntenna.Dialects.dll', backup_file: 'Epam.FixAntenna.Dialects.dll' }
-        - { source_file: 'Epam.FixAntenna.NetCore.dll', backup_file: 'Epam.FixAntenna.NetCore.dll' }
-        - { source_file: 'FIX44.xml', backup_file: 'FIX44.xml' }
-        - { source_file: 'fixengine.properties', backup_file: 'fixengine.properties' }
-        - { source_file: 'NLog.config', backup_file: 'MNLog.config' }
-        - { source_file: 'Providers.TestProvider.pdb', backup_file: 'Providers.TestProvider.pdb' }
-        - { source_file: 'web.config', backup_file: 'web.config' }
+        - { source_file: 'Bridge.Core.exe', task_file: 'Bridge.Core.exe' }
+        - { source_file: 'Bridge.Core.staticwebassets.endpoints.json', task_file: 'Bridge.Core.staticwebassets.endpoints.json' }
+        - { source_file: 'DxFeedGraalNativeSdk.dll', task_file: 'DxFeedGraalNativeSdk.dll' }
+        - { source_file: 'Epam.FixAntenna.Dialects.dll', task_file: 'Epam.FixAntenna.Dialects.dll' }
+        - { source_file: 'Epam.FixAntenna.NetCore.dll', task_file: 'Epam.FixAntenna.NetCore.dll' }
+        - { source_file: 'FIX44.xml', task_file: 'FIX44.xml' }
+        - { source_file: 'fixengine.properties', task_file: 'fixengine.properties' }
+        - { source_file: 'NLog.config', task_file: 'MNLog.config' }
+        - { source_file: 'Providers.TestProvider.pdb', task_file: 'Providers.TestProvider.pdb' }
+        - { source_file: 'web.config', task_file: 'web.config' }
 
     - name: Gateway.MT5 Backup
       ansible.windows.win_copy:
         src: "{{ mt_history_path }}\\Gateway\\Gateway.MT5\\{{ item.source_file }}"
-        dest: "{{ application_path }}\\_backup\\{{ backup_file }}\\Gateway.MT5"
+        dest: "{{ app_path }}\\_backup\\{{ task_file }}\\Gateway.MT5"
         remote_src: true
       loop:
-        - { source_file: 'Brokeree.Bridge.GW.MT5.exe', backup_file: 'Brokeree.Bridge.GW.MT5.exe' }
-        - { source_file: 'Brokeree.MT5GatewayAPI.Native.dll', backup_file: 'Brokeree.MT5GatewayAPI.Native.dll' }
-        - { source_file: 'Brokeree.MT5ManagerAPI.Native.dll', backup_file: 'Brokeree.MT5ManagerAPI.Native.dll' }
-        - { source_file: 'MT5APIGateway64.dll', backup_file: 'MT5APIGateway64.dll' }
-        - { source_file: 'MT5APIGateway64avx.dll', backup_file: 'MT5APIGateway64avx.dll' }
-        - { source_file: 'MT5APIGateway64avx2.dll', backup_file: 'MT5APIGateway64avx2.dll' }
-        - { source_file: 'MT5APIManager64.dll', backup_file: 'MT5APIManager64.dll' }
-        - { source_file: 'MT5APIManager64avx.dll', backup_file: 'MT5APIManager64avx.dll' }
-        - { source_file: 'MT5APIManager64avx2.dll', backup_file: 'MT5APIManager64avx2.dll' }
-        - { source_file: 'NLog.config', backup_file: 'NLog.config' }
+        - { source_file: 'Brokeree.Bridge.GW.MT5.exe', task_file: 'Brokeree.Bridge.GW.MT5.exe' }
+        - { source_file: 'Brokeree.MT5GatewayAPI.Native.dll', task_file: 'Brokeree.MT5GatewayAPI.Native.dll' }
+        - { source_file: 'Brokeree.MT5ManagerAPI.Native.dll', task_file: 'Brokeree.MT5ManagerAPI.Native.dll' }
+        - { source_file: 'MT5APIGateway64.dll', task_file: 'MT5APIGateway64.dll' }
+        - { source_file: 'MT5APIGateway64avx.dll', task_file: 'MT5APIGateway64avx.dll' }
+        - { source_file: 'MT5APIGateway64avx2.dll', task_file: 'MT5APIGateway64avx2.dll' }
+        - { source_file: 'MT5APIManager64.dll', task_file: 'MT5APIManager64.dll' }
+        - { source_file: 'MT5APIManager64avx.dll', task_file: 'MT5APIManager64avx.dll' }
+        - { source_file: 'MT5APIManager64avx2.dll', task_file: 'MT5APIManager64avx2.dll' }
+        - { source_file: 'NLog.config', task_file: 'NLog.config' }
 
     - name: Stop Bridge Services
       ansible.windows.win_service:
-        name: "{{ application_service }}.{{ item }}"
+        name: "{{ app_service }}.{{ item }}"
         state: stopped
         start_mode: manual
       loop: "{{ services }}"
@@ -96,7 +96,7 @@
       ansible.windows.win_powershell:
         script: |
           # Generate a back file name
-          $backupFile = "{{ application_path }}\_backup\{{ backup_file }}\{{ mysql_db_name }}_{{ backup_file }}.sql"
+          $backupFile = "{{ app_path }}\_backup\{{ task_file }}\{{ mysql_db_name }}_{{ task_file }}.sql"
           
           # Navigate to MySQL bin directory
           cd "{{ mysql_bin_path }}"
@@ -115,38 +115,38 @@
 
     - name: Create update directory
       ansible.windows.win_file:
-        path: "{{ application_path }}\\_update\\{{ backup_file }}"
+        path: "{{ app_path }}\\_update\\{{ task_file }}"
         state: directory
 
     - name: Download artifacts from Box
       ansible.windows.win_get_url:
         url: "{{ box_link }}"
-        dest: "{{ application_path }}\\_update\\{{ backup_file }}\\Bridge.zip"
+        dest: "{{ app_path }}\\_update\\{{ task_file }}\\Bridge.zip"
 
     - name: Unarchive artifacts
       community.windows.win_unzip:
-        src: "{{ application_path }}\\_update\\{{ backup_file }}\\Bridge.zip"
-        dest: "{{ application_path }}\\_update\\{{ backup_file }}"
+        src: "{{ app_path }}\\_update\\{{ task_file }}\\Bridge.zip"
+        dest: "{{ app_path }}\\_update\\{{ task_file }}"
         rm: true 
 
     - name: Update Bridge
       ansible.windows.win_copy:
-        src: "{{ application_path }}\\_update\\{{ backup_file }}\\{{ item.source_file }}"
-        dest: "{{ application_path }}"
+        src: "{{ app_path }}\\_update\\{{ task_file }}\\{{ item.source_file }}"
+        dest: "{{ app_path }}"
         remote_src: true
       loop:
-        - { source_file: 'Bridge.API', backup_file: '' }
-        - { source_file: 'Bridge.Core', backup_file: '' }
+        - { source_file: 'Bridge.API', task_file: '' }
+        - { source_file: 'Bridge.Core', task_file: '' }
 
     - name: Update Gateway
       ansible.windows.win_copy:
-        src: "{{ application_path }}\\_update\\{{ backup_file }}\\Gateway.MT5"
+        src: "{{ app_path }}\\_update\\{{ task_file }}\\Gateway.MT5"
         dest: "{{ mt_history_path }}\\Gateway"
         remote_src: true
         
     - name: Starting Bridge Services
       ansible.windows.win_service:
-        name: "{{ application_service }}.{{ item }}"
+        name: "{{ app_service }}.{{ item }}"
         state: started
         start_mode: delayed
       ignore_errors: true
