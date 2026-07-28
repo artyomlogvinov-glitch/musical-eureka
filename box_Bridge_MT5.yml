@@ -128,7 +128,7 @@
 
     - name: Update Bridge
       ansible.windows.win_copy:
-        src: "{{ app_path }}\\Brokeree.Bridge\\{{ item.bridge_files }}\\"
+        src: "{{ app_path }}\\Brokeree.Bridge\\{{ item.bridge_file }}\\"
         dest: "{{ app_path }}\\{{ item.bridge_files }}"
         remote_src: true
       loop:
