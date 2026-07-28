@@ -36,8 +36,8 @@
         state: directory
       loop:
         - { pamm_file: "PAMM" }
-        - { pamm_file: "PAMM.Ratings" }
         - { pamm_file: "PAMM.Web" }
+        - { pamm_file: "PAMM.Ratings" }
         
     - name: Copy PAMM Core
       ansible.windows.win_copy:
