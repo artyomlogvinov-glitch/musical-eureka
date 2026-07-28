@@ -132,11 +132,11 @@
         url: "{{ tc_server }}/repository/download/{{ tc_build_configuration_id }}/{{ tc_build_id }}:id/Brokeree.PAMM-{{ tc_version | urlencode }}.zip"
         headers:
           Authorization: "Bearer {{ tc_token }}"
-        dest: "{{ app_path }}\\_update\\Bridge.zip"
+        dest: "{{ app_path }}\\_update\\app.zip"
 
     - name: Unarchiving
       community.windows.win_unzip:
-        src: "{{ app_path }}\\_update\\Bridge.zip"
+        src: "{{ app_path }}\\_update\\app.zip"
         dest: "{{ app_path }}\\_update"
         rm: true 
 
