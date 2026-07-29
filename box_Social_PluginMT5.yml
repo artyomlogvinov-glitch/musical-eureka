@@ -8,6 +8,7 @@
     services:
       - API
       - Ratings
+    app_name: "Brokeree.SocialTrading"
 
     # Variables on Task Start
     # download_link - derect link
@@ -117,7 +118,7 @@
 
     - name: Update Social
       ansible.windows.win_copy:
-        src: "{{ app_path }}\\_update\\Brokeree.SocialTrading\\{{ item.app_file }}\\"
+        src: "{{ app_path }}\\_update\\{{ app_name }}\\{{ item.app_file }}\\"
         dest: "{{ app_path }}\\{{ item.app_file }}"
         remote_src: true
       loop:
@@ -126,7 +127,7 @@
 
     - name: Update Plugin
       ansible.windows.win_copy:
-        src: "{{ app_path }}\\_update\\Brokeree.SocialTrading\\Plugins\\SocialTrading.MT5.dll"
+        src: "{{ app_path }}\\_update\\{{ app_name }}\\Plugins\\SocialTrading.MT5.dll"
         dest: "{{ mt_maintrade_path }}\\Plugins\\{{ plugin_name }}.dll"
         remote_src: true 
       
