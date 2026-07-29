@@ -9,6 +9,9 @@
     services:
       - API
       - Core
+    app_files:
+      - Bridge.API
+      - Bridge.Core
 
     ## Variables on Task Start
     # download_link
@@ -30,12 +33,13 @@
   tasks:    
     - name: Create backup directories
       ansible.windows.win_file:
-        path: "{{ app_path }}\\_backup\\{{ task_file }}\\{{ item.app_file }}"
+        path: "{{ app_path }}\\_backup\\{{ task_file }}\\{{ item.app_files }}"
         state: directory
-      loop:
-        - { app_file: "Bridge.API" }
-        - { app_file: "Bridge.Core" }
-        - { app_file: "Gateway.MT5" }
+      loop: "{{ app_files }}"
+      
+      ansible.windows.win_file:
+        path: "{{ app_path }}\\_backup\\{{ task_file }}\\Gateway.MT5
+        state: directory
         
     - name: Bridge.API Backup
       ansible.windows.win_copy:
@@ -131,12 +135,10 @@
 
     - name: Update Bridge
       ansible.windows.win_copy:
-        src: "{{ app_path }}\\_update\\{{ app_name }}\\{{ item.app_file }}\\"
-        dest: "{{ app_path }}\\{{ item.app_file }}"
+        src: "{{ app_path }}\\_update\\{{ app_name }}\\{{ item.app_files }}\\"
+        dest: "{{ app_path }}\\{{ item.app_files }}"
         remote_src: true
-      loop:
-        - { app_file: "Bridge.API" }
-        - { app_file: "Bridge.Core" }
+      loop: "{{ app_files }}"
 
     - name: Update Gateway
       ansible.windows.win_copy:
