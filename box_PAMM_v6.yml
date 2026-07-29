@@ -16,9 +16,10 @@
     # Variables from Variable Groups:
     # app_path
     # app_service
+    # mysql_db_name
+    
     # mysql_user
     # mysql_password
-    # mysql_db_name
     # mysql_bin_path
 
   tasks:  
