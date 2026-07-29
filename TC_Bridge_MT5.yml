@@ -8,9 +8,6 @@
     services:
       - API
       - Core
-    ## TeamCity
-    # tc_server  
-    # tc_token
 
     ## Variables on Task Start
     # tc_version
@@ -31,6 +28,9 @@
     # pg_bin_path
     # pg_host
     # pg_port
+
+    # tc_server  
+    # tc_token
     
   tasks:
     - name: Build details
