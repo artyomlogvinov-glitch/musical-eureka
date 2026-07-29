@@ -73,7 +73,7 @@
         - { source_file: 'NLog.config', date_var: 'MNLog.config' }
         - { source_file: 'SocialTrading.Worker.exe', date_var: 'SocialTrading.Worker.exe' } 
 
-    - name: Stop Social Services
+    - name: Stop Services
       ansible.windows.win_service:
         name: "{{ app_service }}.{{ item }}"
         state: stopped
@@ -129,7 +129,7 @@
         - { app_file: "Ratings" }
         - { app_file: "Worker" }
       
-    - name: Starting PAMM Services
+    - name: Starting Services
       ansible.windows.win_service:
         name: "{{ app_service }}.{{ item }}"
         state: started
