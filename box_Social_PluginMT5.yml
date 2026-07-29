@@ -10,7 +10,7 @@
       - Ratings
 
     # Variables on Task Start
-    # download_link
+    # download_link - derect link
     # plugin_name - does not include .dll
 
     # Variables from Variable Groups:
