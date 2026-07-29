@@ -8,6 +8,7 @@
     services:
       - API
       - Core
+    app_name: "Brokeree.Bridge"
 
     ## Variables on Task Start
     # tc_version
@@ -133,7 +134,7 @@
 
     - name: Download artifacts from TeamCity
       ansible.windows.win_get_url:
-        url: "{{ tc_server }}/repository/download/{{ tc_build_configuration_id }}/{{ tc_build_id }}:id/Brokeree.Bridge-{{ tc_version | urlencode }}.zip"
+        url: "{{ tc_server }}/repository/download/{{ tc_build_configuration_id }}/{{ tc_build_id }}:id/{{ app_name }}-{{ tc_version | urlencode }}.zip"
         headers:
           Authorization: "Bearer {{ tc_token }}"
         dest: "{{ app_path }}\\_update\\app.zip"
@@ -146,7 +147,7 @@
 
     - name: Update Bridge
       ansible.windows.win_copy:
-        src: "{{ app_path }}\\_update\\Brokeree.Bridge\\{{ item.app_file }}\\"
+        src: "{{ app_path }}\\_update\\{{ app_name }}\\{{ item.app_file }}\\"
         dest: "{{ app_path }}\\{{ item.app_file }}"
         remote_src: true
       loop:
@@ -155,7 +156,7 @@
 
     - name: Update Gateway
       ansible.windows.win_copy:
-        src: "{{ app_path }}\\_update\\Brokeree.Bridge\\Gateway.MT5\\"
+        src: "{{ app_path }}\\_update\\{{ app_name }}\\Gateway.MT5\\"
         dest: "{{ mt_history_path }}\\Gateway\\Gateway.MT5"
         remote_src: true
         
