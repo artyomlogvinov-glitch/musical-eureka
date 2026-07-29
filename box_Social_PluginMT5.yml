@@ -1,5 +1,5 @@
 ---
-- name: Social + Worker Deploy
+- name: Social + Plugin Deploy
   hosts: windows
   gather_facts: false
   vars:
