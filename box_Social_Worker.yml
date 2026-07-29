@@ -1,5 +1,5 @@
 ---
-- name: PAMM Deploy
+- name: Social + Worker Deploy
   hosts: windows
   gather_facts: false
   vars:
