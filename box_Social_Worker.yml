@@ -5,11 +5,11 @@
   vars:
     # Application settings
     task_file: "{{ lookup('pipe','date +%Y-%m-%d') }} {{ semaphore_vars.task_details.id }}"
+    app_name: "Brokeree.SocialTrading"
     services:
       - API
       - Ratings
       - Worker
-    app_name: "Brokeree.SocialTrading"
 
     # Variables on Task Start
     # download_link - derect link
