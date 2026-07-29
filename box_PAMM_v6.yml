@@ -21,15 +21,7 @@
     # mysql_db_name
     # mysql_bin_path
 
-  tasks:
-    - name: Build details
-      ansible.builtin.debug:
-        msg:
-          - "{{ tc_version }}"
-          - "{{ tc_build_configuration_id }}"
-          - "{{ tc_build_branch }}"
-          - "{{ tc_build_id }}"
-    
+  tasks:  
     - name: Create backup directories
       ansible.windows.win_file:
         path: "{{ app_path }}\\_backup\\{{ task_file }}\\{{ item.app_file }}"
