@@ -23,10 +23,11 @@
     # app_service
     # mt_history_path
     # mt_history_service
-    # mysql_user
-    # mysql_password
-    # mysql_db_name
-    # mysql_bin_path
+    # pg_db_name
+    
+    # pg_user
+    # pg_password
+    # pg_bin_path
     
   tasks:
     - name: Build details
