@@ -115,7 +115,7 @@
 
     - name: Create update directory
       ansible.windows.win_file:
-        path: "{{ app_path }}\\_update\\{{ task_file }}"
+        path: "{{ app_path }}\\_update"
         state: directory
 
     - name: Download archive from Box
