@@ -8,6 +8,7 @@
     services:
       - API
       - Core
+    app_name: "Brokeree.Bridge"
 
     ## Variables on Task Start
     # download_link
@@ -130,7 +131,7 @@
 
     - name: Update Bridge
       ansible.windows.win_copy:
-        src: "{{ app_path }}\\_update\\Brokeree.Bridge\\{{ item.app_file }}\\"
+        src: "{{ app_path }}\\_update\\{{ app_name }}\\{{ item.app_file }}\\"
         dest: "{{ app_path }}\\{{ item.app_file }}"
         remote_src: true
       loop:
@@ -139,7 +140,7 @@
 
     - name: Update Gateway
       ansible.windows.win_copy:
-        src: "{{ app_path }}\\_update\\Brokeree.Bridge\\Gateway.MT5\\"
+        src: "{{ app_path }}\\_update\\{{ app_name }}\\Gateway.MT5\\"
         dest: "{{ mt_history_path }}\\Gateway\\Gateway.MT5"
         remote_src: true
         
