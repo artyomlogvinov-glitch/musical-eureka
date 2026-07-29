@@ -21,11 +21,11 @@
     ## Variables from Variable Groups:    
     # app_path
     # app_service
-    # mt_history_path
-    # mt_history_service
     # pg_db_name
+    
+    # mt_history_path
+    # mt_history_service  
 
-    ## Database Variables
     # pg_user
     # pg_password
     # pg_bin_path
