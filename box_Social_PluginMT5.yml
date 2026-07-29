@@ -21,7 +21,6 @@
     # mt_maintrade_path
     # mt_maintrade_service
 
-    ## Database Variables
     # mysql_user
     # mysql_password
     # mysql_bin_path
