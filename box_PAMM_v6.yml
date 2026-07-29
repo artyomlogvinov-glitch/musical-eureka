@@ -10,6 +10,10 @@
       - Core
       - Web
       - Ratings
+    app_files:
+      - PAMM
+      - PAMM.Ratings
+      - PAMM.Web
 
     # Variables on Task Start
     # download_link - derect link
@@ -26,12 +30,9 @@
   tasks:  
     - name: Create backup directories
       ansible.windows.win_file:
-        path: "{{ app_path }}\\_backup\\{{ task_file }}\\{{ item.app_file }}"
+        path: "{{ app_path }}\\_backup\\{{ task_file }}\\{{ item.app_files }}"
         state: directory
-      loop:
-        - { app_file: "PAMM" }
-        - { app_file: "PAMM.Ratings" }
-        - { app_file: "PAMM.Web" }
+      loop: "{{ app_files }}"
         
     - name: Copy PAMM Core
       ansible.windows.win_copy:
@@ -121,17 +122,14 @@
         dest: "{{ app_path }}\\_update"
         rm: true
 
-    - name: Update PAMM
+    - name: Update Application Files
       ansible.windows.win_copy:
-        src: "{{ app_path }}\\_update\\{{ app_name }}\\{{ item.app_file }}\\"
-        dest: "{{ app_path }}\\{{ item.app_file }}"
+        src: "{{ app_path }}\\_update\\{{ app_name }}\\{{ item.app_files }}\\"
+        dest: "{{ app_path }}\\{{ item.app_files }}"
         remote_src: true
-      loop:
-        - { app_file: "PAMM" }
-        - { app_file: "PAMM.Ratings" }
-        - { app_file: "PAMM.Web" }
+      loop: "{{ app_files }}"
       
-    - name: Starting PAMM Services
+    - name: Starting Services
       ansible.windows.win_service:
         name: "{{ app_service }}.{{ item }}"
         state: started
