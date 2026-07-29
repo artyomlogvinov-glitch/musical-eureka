@@ -6,7 +6,7 @@
     # Application settings
     task_file: "{{ lookup('pipe','date +%Y-%m-%d') }} {{ semaphore_vars.task_details.id }}"
     services:
-      - Core
+      - API
       - Ratings
       - Worker
 
