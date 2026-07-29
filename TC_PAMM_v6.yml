@@ -9,17 +9,14 @@
       - Core
       - Web
       - Ratings
-    # TeamCity
-    # tc_server  
-    # tc_token
 
-    # Variables on Task Start
+    ## Variables on Task Start
     # tc_version
     # tc_build_configuration_id
     # tc_build_branch
     # tc_build_id
 
-    # Variables from Variable Groups:
+    ## Variables from Variable Groups:
     # app_path
     # app_service
     # mysql_db_name
@@ -27,6 +24,9 @@
     # mysql_user
     # mysql_password
     # mysql_bin_path
+
+    # tc_server  
+    # tc_token
 
   tasks:
     - name: Build details
