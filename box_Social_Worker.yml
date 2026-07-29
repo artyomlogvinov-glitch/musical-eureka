@@ -10,6 +10,10 @@
       - API
       - Ratings
       - Worker
+    app_files:
+      - API
+      - Ratings
+      - Worker
 
     # Variables on Task Start
     # download_link - derect link
@@ -26,12 +30,9 @@
   tasks:  
     - name: Create backup directories
       ansible.windows.win_file:
-        path: "{{ app_path }}\\_backup\\{{ task_file }}\\{{ item.app_file }}"
+        path: "{{ app_path }}\\_backup\\{{ task_file }}\\{{ item }}"
         state: directory
-      loop:
-        - { app_file: "API" }
-        - { app_file: "Ratings" }
-        - { app_file: "Worker" }
+      loop: "{{ app_files }}"
         
     - name: Copy Social API
       ansible.windows.win_copy:
@@ -119,15 +120,12 @@
         dest: "{{ app_path }}\\_update"
         rm: true
 
-    - name: Update Social
+    - name: Update Application files
       ansible.windows.win_copy:
-        src: "{{ app_path }}\\_update\\{{ app_name }}\\{{ item.app_file }}\\"
-        dest: "{{ app_path }}\\{{ item.app_file }}"
+        src: "{{ app_path }}\\_update\\{{ app_name }}\\{{ item }}\\"
+        dest: "{{ app_path }}\\{{ item }}"
         remote_src: true
-      loop:
-        - { app_file: "API" }
-        - { app_file: "Ratings" }
-        - { app_file: "Worker" }
+      loop: "{{ app_files }}"
       
     - name: Starting Services
       ansible.windows.win_service:
