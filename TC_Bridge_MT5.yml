@@ -149,7 +149,7 @@
         dest: "{{ app_path }}\\_update"
         rm: true 
 
-    - name: Update Bridge
+    - name: Update Application Files
       ansible.windows.win_copy:
         src: "{{ app_path }}\\_update\\{{ app_name }}\\{{ item.app_files }}\\"
         dest: "{{ app_path }}\\{{ item.app_files }}"
