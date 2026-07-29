@@ -14,7 +14,7 @@
       - Bridge.Core
 
     ## Variables on Task Start
-    # download_link - derect lin
+    # download_link - derect link
 
     ## Variables from Variable Groups:    
     # app_path
