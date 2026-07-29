@@ -11,7 +11,7 @@
       - Worker
 
     # Variables on Task Start
-    # download_link
+    # download_link - derect link
 
     # Variables from Variable Groups:
     # app_path
