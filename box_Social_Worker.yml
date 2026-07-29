@@ -71,6 +71,7 @@
         - { source_file: 'ijwhost.dll', date_var: 'ijwhost.dll' }
         - { source_file: 'MT5APIManager64.dll', date_var: 'MT5APIManager64.dll' }
         - { source_file: 'NLog.config', date_var: 'MNLog.config' }
+        - { source_file: 'SocialTrading.Worker.exe', date_var: 'SocialTrading.Worker.exe' } 
 
     - name: Stop Social Services
       ansible.windows.win_service:
