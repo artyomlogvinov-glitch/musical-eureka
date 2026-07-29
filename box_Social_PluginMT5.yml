@@ -11,7 +11,7 @@
 
     # Variables on Task Start
     # download_link
-    # plugin_name does not include .dll
+    # plugin_name - does not include .dll
 
     # Variables from Variable Groups:
     # app_path
