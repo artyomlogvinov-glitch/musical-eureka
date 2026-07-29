@@ -47,7 +47,7 @@
     
     - name: Create backup directories
       ansible.windows.win_file:
-        path: "{{ app_path }}\\_backup\\{{ task_file }}\\{{ item.app_files }}"
+        path: "{{ app_path }}\\_backup\\{{ task_file }}\\{{ item }}"
         state: directory
       loop: "{{ app_files }}"
       
@@ -151,8 +151,8 @@
 
     - name: Update Application Files
       ansible.windows.win_copy:
-        src: "{{ app_path }}\\_update\\{{ app_name }}\\{{ item.app_files }}\\"
-        dest: "{{ app_path }}\\{{ item.app_files }}"
+        src: "{{ app_path }}\\_update\\{{ app_name }}\\{{ item }}\\"
+        dest: "{{ app_path }}\\{{ item }}"
         remote_src: true
       loop: "{{ app_files }}"
 
