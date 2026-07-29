@@ -5,10 +5,10 @@
   vars:
     # Application settings
     task_file: "{{ lookup('pipe','date +%Y-%m-%d') }} {{ semaphore_vars.task_details.id }}"
+    app_name: "Brokeree.Bridge"
     services:
       - API
       - Core
-    app_name: "Brokeree.Bridge"
 
     ## Variables on Task Start
     # download_link
