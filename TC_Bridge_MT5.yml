@@ -102,7 +102,7 @@
         - { source_file: 'MT5APIManager64avx2.dll', task_file: 'MT5APIManager64avx2.dll' }
         - { source_file: 'NLog.config', task_file: 'NLog.config' }
 
-    - name: Stop Bridge Services
+    - name: Stop Services
       ansible.windows.win_service:
         name: "{{ app_service }}.{{ item }}"
         state: stopped
@@ -162,7 +162,7 @@
         dest: "{{ mt_history_path }}\\Gateway\\Gateway.MT5"
         remote_src: true
         
-    - name: Starting Bridge Services
+    - name: Starting Services
       ansible.windows.win_service:
         name: "{{ app_service }}.{{ item }}"
         state: started
