@@ -24,7 +24,6 @@
     # app_service
     # mysql_db_name
 
-    ## Database Variables
     # mysql_user
     # mysql_password
     # mysql_bin_path
