@@ -24,7 +24,8 @@
     # mt_history_path
     # mt_history_service
     # pg_db_name
-    
+
+    ## Database Variables
     # pg_user
     # pg_password
     # pg_bin_path
