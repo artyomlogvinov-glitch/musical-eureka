@@ -12,12 +12,12 @@
 
     # Variables on Task Start
     # download_link - derect link
-    # plugin_name - does not include .dll
 
     # Variables from Variable Groups:
     # app_path
     # app_service
     # mysql_db_name
+    # plugin_name - does not include .dll
     
     # mt_maintrade_path
     # mt_maintrade_service
