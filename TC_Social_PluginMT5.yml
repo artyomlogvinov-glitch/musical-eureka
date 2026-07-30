@@ -1,0 +1,158 @@
+---
+- name: Social + Plugin Deploy
+  hosts: windows
+  gather_facts: false
+  vars:
+    # Application settings
+    task_file: "{{ lookup('pipe','date +%Y-%m-%d') }} {{ semaphore_vars.task_details.id }}"
+    app_name: "Brokeree.SocialTrading"
+    services:
+      - API
+      - Ratings
+    app_files:
+      - API
+      - Ratings
+
+    # Variables on Task Start
+    # tc_version
+    # tc_build_configuration_id
+    # tc_build_branch
+    # tc_build_id
+
+    # Variables from Variable Groups:
+    # app_path
+    # app_service
+    # mysql_db_name
+    # plugin_name - does not include .dll
+    
+    # mt_maintrade_path
+    # mt_maintrade_service
+
+    # mysql_user
+    # mysql_password
+    # mysql_bin_path
+
+    # tc_server  
+    # tc_token
+
+  tasks:  
+    - name: Create backup directories
+      ansible.windows.win_file:
+        path: "{{ app_path }}\\_backup\\{{ task_file }}\\{{ item }}"
+        state: directory
+      loop: "{{ app_files }}"
+        
+    - name: Copy Social API
+      ansible.windows.win_copy:
+        src: "{{ app_path }}\\API\\{{ item.source_file }}"
+        dest: "{{ app_path }}\\_backup\\{{ task_file }}\\API"
+        remote_src: true
+      loop:
+        - { source_file: 'templates', date_var: '' }
+        - { source_file: 'ijwhost.dll', date_var: 'ijwhost.dll' }
+        - { source_file: 'MT5APIManager64.dll', date_var: 'MT5APIManager64.dll' }
+        - { source_file: 'NLog.config', date_var: 'MNLog.config' }
+        - { source_file: 'SocialTrading.API.exe', date_var: 'SocialTrading.API.exe' }
+        - { source_file: 'wwwadmin.zip', date_var: 'wwwadmin.zip' }
+        - { source_file: 'wwwuser.zip', date_var: 'wwwuser.zip' }
+        - { source_file: 'wwwwidgets.zip', date_var: 'wwwwidgets.zip' } 
+        
+    - name: Copy Social Ratings
+      ansible.windows.win_copy:
+        src: "{{ app_path }}\\Ratings\\{{ item.source_file }}"
+        dest: "{{ app_path }}\\_backup\\{{ task_file }}\\Ratings"
+        remote_src: true
+      loop:
+        - { source_file: 'ijwhost.dll', date_var: 'ijwhost.dll' }
+        - { source_file: 'MT5APIManager64.dll', date_var: 'MT5APIManager64.dll' }
+        - { source_file: 'NLog.config', date_var: 'MNLog.config' }
+        - { source_file: 'SocialTrading.Ratings.exe', date_var: 'SocialTrading.Ratings.exe' }
+        - { source_file: 'wwwcomponents.zip', date_var: 'wwwcomponents.zip' }
+        - { source_file: 'wwwroot.zip', date_var: 'wwwroot.zip' }
+        - { source_file: 'wwwwidgets.zip', date_var: 'wwwwidgets.zip' }
+
+    - name: Stop Services
+      ansible.windows.win_service:
+        name: "{{ app_service }}.{{ item }}"
+        state: stopped
+        start_mode: manual
+      loop: "{{ services }}"
+
+    - name: Stop MT5 Main Trader Services
+      ansible.windows.win_service:
+        name: "{{ mt_maintrade_service }}"
+        state: stopped
+        start_mode: manual
+        
+    - name: Creating MySQL backup
+      ansible.windows.win_powershell:
+        script: |
+          # Generate a back file name
+          $backupFile = "{{ app_path }}\_backup\{{ task_file }}\{{ mysql_db_name }}_{{ task_file }}.sql"
+          $backupFile2 = "{{ app_path }}\_backup\{{ task_file }}\{{ mysql_db_name }}_ratings_module_{{ task_file }}.sql"
+          
+          # Navigate to MySQL bin directory
+          cd "{{ mysql_bin_path }}"
+          
+          # Execute mysqldump
+          ./mysqldump.exe --user="{{ mysql_user }}" --password="{{ mysql_password }}" {{ mysql_db_name }} --result-file=$backupFile
+          ./mysqldump.exe --user="{{ mysql_user }}" --password="{{ mysql_password }}" {{ mysql_db_name }}_ratings_module --result-file=$backupFile2
+          
+          # Verify file was created and isn't empty
+          if (Test-Path $backupFile) {
+              $size = (Get-Item $backupFile).Length
+              return @{ backup_path = $backupFile; size_bytes = $size; success = $true }
+          } else {
+              throw "Mysqldump failed to create the backup file."
+          }
+      register: mysql_backup_result
+
+    - name: Create update directory
+      ansible.windows.win_file:
+        path: "{{ app_path }}\\_update"
+        state: directory
+
+    - name: Download artifacts from TeamCity
+      ansible.windows.win_get_url:
+        url: "{{ tc_server }}/repository/download/{{ tc_build_configuration_id }}/{{ tc_build_id }}:id/{{ app_name }}-{{ tc_version | urlencode }}.zip"
+        headers:
+          Authorization: "Bearer {{ tc_token }}"
+        dest: "{{ app_path }}\\_update\\app.zip"
+
+    - name: Unarchiving the artefacts
+      community.windows.win_unzip:
+        src: "{{ app_path }}\\_update\\app.zip"
+        dest: "{{ app_path }}\\_update"
+        rm: true
+
+    - name: Update Application files
+      ansible.windows.win_copy:
+        src: "{{ app_path }}\\_update\\{{ app_name }}\\{{ item }}\\"
+        dest: "{{ app_path }}\\{{ item }}"
+        remote_src: true
+      loop: "{{ app_files }}"
+
+    - name: Update Plugin
+      ansible.windows.win_copy:
+        src: "{{ app_path }}\\_update\\{{ app_name }}\\Plugins\\SocialTrading.MT5.dll"
+        dest: "{{ mt_maintrade_path }}\\Plugins\\{{ plugin_name }}.dll"
+        remote_src: true 
+      
+    - name: Starting Services
+      ansible.windows.win_service:
+        name: "{{ app_service }}.{{ item }}"
+        state: started
+        start_mode: delayed
+      ignore_errors: true
+      loop: "{{ services }}"
+
+    - name: Start MT5 Main Trader Services
+      ansible.windows.win_service:
+        name: "{{ mt_maintrade_service }}"
+        state: started
+        start_mode: delayed
+
+    - name: Deleting update folder
+      ansible.windows.win_file:
+        path: "{{ app_path }}\\_update"
+        state: absent
