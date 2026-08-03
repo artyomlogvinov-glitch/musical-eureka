@@ -86,9 +86,7 @@
         - { source_file: 'PAMM.API.xml', task_file: 'PAMM.API.xml' }
         - { source_file: 'PAMM.Model.xml', task_file: 'PAMM.Model.xml' }
         - { source_file: 'PAMM.Web.exe', task_file: 'PAMM.Web.exe' }
-        - { source_file: 'wwwadmin.zip', task_file: 'wwwadmin.zip' }
-        - { source_file: 'wwwinvestor.zip', task_file: 'wwwinvestor.zip' }
-        - { source_file: 'wwwmanager.zip', task_file: 'wwwmanager.zip' } 
+        - { source_file: 'webapp.zip', task_file: 'webapp.zip' }
 
     - name: Stop PAMM Services
       ansible.windows.win_service:
