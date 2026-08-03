@@ -1,5 +1,5 @@
 ---
-- name: PAMM Deploy
+- name: Marketing Suite Deploy
   hosts: windows
   gather_facts: false
   vars:
