@@ -1,0 +1,144 @@
+---
+- name: PAMM Deploy
+  hosts: windows
+  gather_facts: false
+  vars:
+    # Application settings
+    task_file: "{{ lookup('pipe','date +%Y-%m-%d') }} {{ semaphore_vars.task_details.id }}"
+    app_name: "Brokeree.MarketingSuite"
+    services:
+      - MT4
+      - MT5
+    app_files:
+      - MT4
+      - MT5
+
+    ## Variables on Task Start
+    # tc_version
+    # tc_build_configuration_id
+    # tc_build_branch
+    # tc_build_id
+
+    ## Variables from Variable Groups:
+    # app_path
+    # app_service
+    # mysql_db_name
+
+    # mysql_user
+    # mysql_password
+    # mysql_bin_path
+
+    # tc_server  
+    # tc_token
+
+  tasks:
+    - name: Build details
+      ansible.builtin.debug:
+        msg:
+          - "{{ tc_version }}"
+          - "{{ tc_build_configuration_id }}"
+          - "{{ tc_build_branch }}"
+          - "{{ tc_build_id }}"
+    
+    - name: Create backup directories
+      ansible.windows.win_file:
+        path: "{{ app_path }}\\_backup\\{{ task_file }}\\{{ item }}"
+        state: directory
+      loop: "{{ app_files }}"
+        
+    - name: Copy MT4 files
+      ansible.windows.win_copy:
+        src: "{{ app_path }}\\MT4\\{{ item.source_file }}"
+        dest: "{{ app_path }}\\_backup\\{{ task_file }}\\PAMM"
+        remote_src: true
+      loop:
+        - { source_file: 'x64', task_file: '' }
+        - { source_file: 'x86', task_file: '' }
+        - { source_file: 'BonusManager.Database.dll.config', task_file: 'BonusManager.Database.dll.config' }
+        - { source_file: 'BonusManager.MT4.exe', task_file: 'BonusManager.MT4.exe' }
+        - { source_file: 'BonusManager.MT4.exe.config', task_file: 'BonusManager.MT4.exe.config' }
+        - { source_file: 'e_sqlite3.dll', task_file: 'e_sqlite3.dll' }
+        - { source_file: 'NLog.config', task_file: 'NLog.config' }
+        - { source_file: 'wwwroot.zip', task_file: 'wwwroot.zip' }
+        
+    - name: Copy MT5 files
+      ansible.windows.win_copy:
+        src: "{{ app_path }}\\MT5\\{{ item.source_file }}"
+        dest: "{{ app_path }}\\_backup\\{{ task_file }}\\PAMM.Ratings"
+        remote_src: true
+      loop:
+        - { source_file: 'x64', task_file: '' }
+        - { source_file: 'x86', task_file: '' }
+        - { source_file: 'BonusManager.Database.dll.config', task_file: 'BonusManager.Database.dll.config' }
+        - { source_file: 'BonusManager.MT5.exe', task_file: 'BonusManager.MT5.exe' }
+        - { source_file: 'BonusManager.MT5.exe.config', task_file: 'BonusManager.MT5.exe.config' }
+        - { source_file: 'e_sqlite3.dll', task_file: 'e_sqlite3.dll' }
+        - { source_file: 'MT5APIManager64.dll', task_file: 'MT5APIManager64.dll' }
+        - { source_file: 'NLog.config', task_file: 'NLog.config' }
+        - { source_file: 'wwwroot.zip', task_file: 'wwwroot.zip' }
+
+    - name: Stop Marketing Suite Services
+      ansible.windows.win_service:
+        name: "{{ app_service }}.{{ item }}"
+        state: stopped
+        start_mode: manual
+      loop: "{{ services }}"
+      
+    - name: Creating MySQL backup
+      ansible.windows.win_powershell:
+        script: |
+          # Generate a back file name
+          $backupFile = "{{ app_path }}\_backup\{{ task_file }}\{{ mysql_db_name }}_{{ task_file }}.sql"
+          
+          # Navigate to MySQL bin directory
+          cd "{{ mysql_bin_path }}"
+          
+          # Execute mysqldump
+          ./mysqldump.exe --user="{{ mysql_user }}" --password="{{ mysql_password }}" {{ mysql_db_name }} --result-file=$backupFile
+          
+          # Verify file was created and isn't empty
+          if (Test-Path $backupFile) {
+              $size = (Get-Item $backupFile).Length
+              return @{ backup_path = $backupFile; size_bytes = $size; success = $true }
+          } else {
+              throw "Mysqldump failed to create the backup file."
+          }
+      register: mysql_backup_result
+
+    - name: Create update directory
+      ansible.windows.win_file:
+        path: "{{ app_path }}\\_update"
+        state: directory
+
+    - name: Download artifacts from TeamCity
+      ansible.windows.win_get_url:
+        url: "{{ tc_server }}/repository/download/{{ tc_build_configuration_id }}/{{ tc_build_id }}:id/{{ app_name }}-{{ tc_version | urlencode }}.zip"
+        headers:
+          Authorization: "Bearer {{ tc_token }}"
+        dest: "{{ app_path }}\\_update\\app.zip"
+
+    - name: Unarchiving the artefacts
+      community.windows.win_unzip:
+        src: "{{ app_path }}\\_update\\app.zip"
+        dest: "{{ app_path }}\\_update"
+        rm: true
+
+    - name: Update Application Files
+      ansible.windows.win_copy:
+        src: "{{ app_path }}\\_update\\{{ app_name }}\\{{ item }}\\"
+        dest: "{{ app_path }}\\{{ item }}"
+        remote_src: true
+      loop: "{{ app_files }}"
+      
+    - name: Starting PAMM Services
+      ansible.windows.win_service:
+        name: "{{ app_service }}.{{ item }}"
+        state: started
+        start_mode: delayed
+      ignore_errors: true
+      loop: "{{ services }}"
+
+    - name: Deleting update folder
+      ansible.windows.win_file:
+        path: "{{ app_path }}\\_update"
+        state: absent
