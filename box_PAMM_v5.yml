@@ -1,0 +1,141 @@
+---
+- name: PAMM Deploy
+  hosts: windows
+  gather_facts: false
+  vars:
+    # Application settings
+    task_file: "{{ lookup('pipe','date +%Y-%m-%d') }} {{ semaphore_vars.task_details.id }}"
+    app_name: "Brokeree.PAMM"
+    services:
+      - Core
+      - Web
+      - Ratings
+    app_files:
+      - PAMM
+      - PAMM.Ratings
+      - PAMM.Web
+
+    # Variables on Task Start
+    # download_link - derect link
+
+    # Variables from Variable Groups:
+    # app_path
+    # app_service
+    # mysql_db_name
+
+    # mysql_user
+    # mysql_password
+    # mysql_bin_path
+
+  tasks:  
+    - name: Create backup directories
+      ansible.windows.win_file:
+        path: "{{ app_path }}\\_backup\\{{ task_file }}\\{{ item.app_files }}"
+        state: directory
+      loop: "{{ app_files }}"
+        
+    - name: Copy PAMM Core
+      ansible.windows.win_copy:
+        src: "{{ app_path }}\\PAMM\\{{ item.source_file }}"
+        dest: "{{ app_path }}\\_backup\\{{ task_file }}\\PAMM"
+        remote_src: true
+      loop:
+        - { source_file: 'ijwhost.dll', task_file: 'ijwhost.dll' }
+        - { source_file: 'MT5APIManager64.dll', task_file: 'MT5APIManager64.dll' }
+        - { source_file: 'NLog.config', task_file: 'MNLog.config' }
+        - { source_file: 'PAMM.exe', task_file: 'PAMM.exe' }
+        
+    - name: Copy PAMM Ratings
+      ansible.windows.win_copy:
+        src: "{{ app_path }}\\PAMM.Ratings\\{{ item.source_file }}"
+        dest: "{{ app_path }}\\_backup\\{{ task_file }}\\PAMM.Ratings"
+        remote_src: true
+      loop:
+        - { source_file: 'ijwhost.dll', task_file: 'ijwhost.dll' }
+        - { source_file: 'MT5APIManager64.dll', task_file: 'MT5APIManager64.dll' }
+        - { source_file: 'NLog.config', task_file: 'MNLog.config' }
+        - { source_file: 'PAMM.Ratings.exe', task_file: 'PAMM.Ratings.exe' }
+        - { source_file: 'wwwcomponents.zip', task_file: 'wwwcomponents.zip' }
+        - { source_file: 'wwwroot.zip', task_file: 'wwwroot.zip' }
+        - { source_file: 'wwwwidgets.zip', task_file: 'wwwwidgets.zip' }
+
+    - name: Copy PAMM Web
+      ansible.windows.win_copy:
+        src: "{{ app_path }}\\PAMM.Web\\{{ item.source_file }}"
+        dest: "{{ app_path }}\\_backup\\{{ task_file }}\\PAMM.Web"
+        remote_src: true
+      loop:
+        - { source_file: 'templates', task_file: '' }
+        - { source_file: 'ijwhost.dll', task_file: 'ijwhost.dll' }
+        - { source_file: 'MT5APIManager64.dll', task_file: 'MT5APIManager64.dll' }
+        - { source_file: 'NLog.config', task_file: 'MNLog.config' }
+        - { source_file: 'PAMM.API.xml', task_file: 'PAMM.API.xml' }
+        - { source_file: 'PAMM.Model.xml', task_file: 'PAMM.Model.xml' }
+        - { source_file: 'PAMM.Web.exe', task_file: 'PAMM.Web.exe' }
+        - { source_file: 'webapp.zip', task_file: 'webapp.zip' }
+
+    - name: Stop PAMM Services
+      ansible.windows.win_service:
+        name: "{{ app_service }}.{{ item }}"
+        state: stopped
+        start_mode: manual
+      loop: "{{ services }}"
+      
+    - name: Creating MySQL backup
+      ansible.windows.win_powershell:
+        script: |
+          # Generate a back file name
+          $backupFile = "{{ app_path }}\_backup\{{ task_file }}\{{ mysql_db_name }}_{{ task_file }}.sql"
+          $backupFile2 = "{{ app_path }}\_backup\{{ task_file }}\{{ mysql_db_name }}_ratings_module_{{ task_file }}.sql"
+          
+          # Navigate to MySQL bin directory
+          cd "{{ mysql_bin_path }}"
+          
+          # Execute mysqldump
+          ./mysqldump.exe --user="{{ mysql_user }}" --password="{{ mysql_password }}" {{ mysql_db_name }} --result-file=$backupFile
+          ./mysqldump.exe --user="{{ mysql_user }}" --password="{{ mysql_password }}" {{ mysql_db_name }}_ratings_module --result-file=$backupFile2
+          
+          # Verify file was created and isn't empty
+          if (Test-Path $backupFile) {
+              $size = (Get-Item $backupFile).Length
+              return @{ backup_path = $backupFile; size_bytes = $size; success = $true }
+          } else {
+              throw "Mysqldump failed to create the backup file."
+          }
+      register: mysql_backup_result
+
+    - name: Create update directory
+      ansible.windows.win_file:
+        path: "{{ app_path }}\\_update"
+        state: directory
+
+    - name: Download archive from Box
+      ansible.windows.win_get_url:
+        url: "{{ download_link }}"
+        dest: "{{ app_path }}\\_update\\app.zip"
+
+    - name: Unarchiving the artefacts
+      community.windows.win_unzip:
+        src: "{{ app_path }}\\_update\\app.zip"
+        dest: "{{ app_path }}\\_update"
+        rm: true
+
+    - name: Update Application Files
+      ansible.windows.win_copy:
+        src: "{{ app_path }}\\_update\\{{ app_name }}\\{{ item.app_files }}\\"
+        dest: "{{ app_path }}\\{{ item.app_files }}"
+        remote_src: true
+      loop: "{{ app_files }}"
+      
+    - name: Starting Services
+      ansible.windows.win_service:
+        name: "{{ app_service }}.{{ item }}"
+        state: started
+        start_mode: delayed
+      ignore_errors: true
+      loop: "{{ services }}"
+
+    - name: Deleting update folder
+      ansible.windows.win_file:
+        path: "{{ app_path }}\\_update"
+        state: absent
