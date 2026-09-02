@@ -59,7 +59,7 @@
         description: "{{ app_name }}-{{ unique_id }}.{{ item }}"
         path: '{{ app_install_dir }}\{{ app_files }}\{{ app_name_short }}.{{ item }}.exe --service'
         start_mode: manual
-        state: present
+        state: stopped
       loop: "{{ app_files }}"
 
     - name: First services start (creating appsettings)
