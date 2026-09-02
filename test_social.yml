@@ -69,6 +69,13 @@
       ignore_errors: true
       loop: "{{ app_files }}"
 
+    - name: Stop Services (if they started)
+      ansible.windows.win_service:
+        name: "{{ app_name }}-{{ unique_id }}.{{ item }}"
+        state: stopped
+        start_mode: manual
+      loop: "{{ app_files }}"
+
     - name: Read API/appsettings.json file
       ansible.windows.slurp:
         src: "{{ app_install_dir }}\\API\\appsettings.json"
@@ -79,27 +86,32 @@
         current_config: "{{ raw_json.content | b64decode | from_json }}"
 
     - name: Update specific values in the JSON structure
+      mysql_connectionString: "Server=localhost;Database=social_trading_{{ unique_id }};User={{ mysql_user }};Password={{ mysql_password }}"
+      all_url_social: "http://{{ url_social }};https://{{ url_social }}""
+      https_url_social: "https://{{ url_social }}"
+      all_url_ratings: "http://{{ url_ratings }};https://{{ url_ratings }}"
+      https_url_ratings: "https://{{ url_ratings }}"
       ansible.builtin.set_fact:
         updated_config: >- 
          {{
           current_config | combine({
-            'Urls': 'http://{{ url_social }};https://{{ url_social }}',
-            'ConnectionString': 'Server=localhost;Database=social_trading_{{ unique_id }};User={{ mysql_user }};Password={{ mysql_password }}',
+            'Urls': all_url_social,
+            'ConnectionString': mysql_connectionString,
             'LetsEncrypt': {
               'Enabled': true,
               'ContactEmail': 'itops@brokeree.com',
               'UseStagingServer': false 
               },
             'Analytics': {
-              'Url': 'http://{{ url_ratings }};https://{{ url_ratings }}',
-              'PublicLink': 'https://{{ url_ratings }}',
-              'PublicSocialUrl': 'https://{{ url_social }}',
-              'InternalRatingsUrl': 'https://{{ url_ratings }}' 
+              'Url': all_url_ratings,
+              'PublicLink': https_url_ratings,
+              'PublicSocialUrl': https_url_social,
+              'InternalRatingsUrl': https_url_ratings 
               }
             }, recursive=True)
           }}
 
     - name: Write modified JSON back to file
       ansible.windows.win_copy:
-        content: "{{ updated_config | to_nice_json }}"
+        content: "{{ updated_config | to_nice_json(sort_keys=False) }}"
         dest: "{{ app_install_dir }}\\API\\appsettings.json"
