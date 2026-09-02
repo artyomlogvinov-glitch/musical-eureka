@@ -81,7 +81,7 @@
     - name: Update specific values in the JSON structure
       ansible.builtin.set_fact:
         updated_config: >- 
-        "{{
+         {{
           current_config | combine({
             'Urls': 'http://{{ url_social }};https://{{ url_social }}',
             'ConnectionString': 'Server=localhost;Database=social_trading_{{ unique_id }};User={{ mysql_user }};Password={{ mysql_password }}',
@@ -97,7 +97,7 @@
               'InternalRatingsUrl': 'https://{{ url_ratings }}' 
               }
             }, recursive=True)
-          }}"
+          }}
 
     - name: Write modified JSON back to file
       ansible.windows.win_copy:
