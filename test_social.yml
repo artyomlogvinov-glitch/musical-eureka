@@ -70,7 +70,7 @@
       loop: "{{ app_files }}"
 
     - name: Read API/appsettings.json file
-      ansible.windows.win_slurp:
+      ansible.windows.slurp:
         src: "{{ app_install_dir }}\\API\\appsettins.json"
       register: raw_json
 
