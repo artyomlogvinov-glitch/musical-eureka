@@ -71,7 +71,7 @@
 
     - name: Read API/appsettings.json file
       ansible.windows.slurp:
-        src: "{{ app_install_dir }}\\API\\appsettins.json"
+        src: "{{ app_install_dir }}\\API\\appsettings.json"
       register: raw_json
 
     - name: Parse JSON into an Ansible variable
