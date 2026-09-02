@@ -83,7 +83,7 @@
         "{{
           current_config | combine({
             'Urls': 'http://{{ url_social }};https://{{ url_social }}',
-            'ConnectionString': 'Server=localhost;Database=social_trading_{{ unique_id }};User=Admin;Password=BrokereeAdmin',
+            'ConnectionString': 'Server=localhost;Database=social_trading_{{ unique_id }};User={{ mysql_user }};Password={{ mysql_password }}',
             'LetsEncrypt': {
               'Enabled': true,
               'ContactEmail': 'itops@brokeree.com',
