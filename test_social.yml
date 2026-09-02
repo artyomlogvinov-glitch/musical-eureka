@@ -1,0 +1,104 @@
+---
+- name: Social + Worker Deploy
+  hosts: windows
+  gather_facts: false
+  vars:
+    # Application settings
+    unique_id: "{{ semaphore_vars.task_details.id }}"
+    app_name: "Brokeree.SocialTrading"
+    app_name_short: "SocialTrading"
+    app_install_dir: "{{ app_path }}\\{{ app_name }}-{{ unique_id }}"
+    url_social: "social-{{ unique_id }}.sup.brokeree.dev"
+    url_ratings: "social-ratings-{{ unique_id }}.sup.brokeree.dev"
+    services:
+      - API
+      - Ratings
+      - Worker
+    app_files:
+      - API
+      - Ratings
+      - Worker
+
+    # Variables on Task Start
+    # download_link - derect link
+
+    # Variables from Variable Groups:
+    # app_path
+    # app_service
+    # mysql_db_name
+
+    # mysql_user
+    # mysql_password
+    # mysql_bin_path
+
+  tasks:  
+    - name: Create app directory
+      ansible.windows.win_file:
+        path: "{{ app_path }}"
+        state: directory       
+
+    - name: Download archive from Box
+      ansible.windows.win_get_url:
+        url: "{{ download_link }}"
+        dest: "{{ app_path }}\\app.zip"
+
+    - name: Unarchiving the files
+      community.windows.win_unzip:
+        src: "{{ app_path }}\\app.zip"
+        dest: "{{ app_path }}"
+        rm: true
+
+    - name: Assign unique name for app directory 
+      ansible.windows.win_command: cmd.exe /c ren "{{ app_path }}\{{ app_name }}" "{{ app_name }}-{{ unique_id }}"
+
+    - name: Create services for an app
+      ansible.windows.win_service:
+        name: "{{ app_name }}-{{ unique_id }}.{{ item }}"
+        display_name: "{{ app_name }}-{{ unique_id }}.{{ item }}"
+        description: "{{ app_name }}-{{ unique_id }}.{{ item }}"
+        path: '{{ app_install_dir }}\{{ app_files }}\{{ app_name_short }}.{{ item }}.exe --service'
+        start_mode: manual
+        state: present
+      loop: "{{ app_files }}"
+
+    - name: First services start (creating appsettings)
+      ansible.windows.win_service:
+        name: "{{ app_name }}-{{ unique_id }}.{{ item }}"
+        state: started
+      ignore_errors: true
+      loop: "{{ app_files }}"
+
+    - name: Read API/appsettings.json file
+      ansible.windows.win_slurp:
+        src: "{{ app_install_dir }}\\API\\appsettins.json"
+      register: raw_json
+
+    - name: Parse JSON into an Ansible variable
+      ansible.builtin.set_fact:
+        current_config: "{{ raw_json.content | b64decode | from_json }}"
+
+    - name: Update specific values in the JSON structure
+      ansible.builtin.set_fact:
+        updated_config: >- 
+        "{{
+          current_config | combine({
+            'Urls': 'http://{{ url_social }};https://{{ url_social }}',
+            'ConnectionString': 'Server=localhost;Database=social_trading_{{ unique_id }};User=Admin;Password=BrokereeAdmin',
+            'LetsEncrypt': {
+              'Enabled': true,
+              'ContactEmail': 'itops@brokeree.com',
+              'UseStagingServer': false 
+              },
+            'Analytics': {
+              'Url': 'http://{{ url_ratings }};https://{{ url_ratings }}',
+              'PublicLink': 'https://{{ url_ratings }}',
+              'PublicSocialUrl': 'https://{{ url_social }}',
+              'InternalRatingsUrl': 'https://{{ url_ratings }}' 
+              }
+            }, recursive=True)
+          }}"
+
+    - name: Write modified JSON back to file
+      ansible.windows.win_copy:
+        content: "{{ updated_config | to_nice_json }}"
+        dest: "{{ json_file_path }}"
