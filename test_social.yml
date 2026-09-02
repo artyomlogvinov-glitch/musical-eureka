@@ -10,6 +10,13 @@
     app_install_dir: "{{ app_path }}\\{{ app_name }}-{{ unique_id }}"
     url_social: "social-{{ unique_id }}.sup.brokeree.dev"
     url_ratings: "social-ratings-{{ unique_id }}.sup.brokeree.dev"
+
+    mysql_connectionString: "Server=localhost;Database=social_trading_{{ unique_id }};User={{ mysql_user }};Password={{ mysql_password }}"
+    all_url_social: "http://{{ url_social }};https://{{ url_social }}"
+    https_url_social: "https://{{ url_social }}"
+    all_url_ratings: "http://{{ url_ratings }};https://{{ url_ratings }}"
+    https_url_ratings: "https://{{ url_ratings }}"
+    
     services:
       - API
       - Ratings
@@ -86,11 +93,6 @@
         current_config: "{{ raw_json.content | b64decode | from_json }}"
 
     - name: Update specific values in the JSON structure
-      mysql_connectionString: "Server=localhost;Database=social_trading_{{ unique_id }};User={{ mysql_user }};Password={{ mysql_password }}"
-      all_url_social: "http://{{ url_social }};https://{{ url_social }}"
-      https_url_social: "https://{{ url_social }}"
-      all_url_ratings: "http://{{ url_ratings }};https://{{ url_ratings }}"
-      https_url_ratings: "https://{{ url_ratings }}"
       ansible.builtin.set_fact:
         updated_config: >- 
          {{
