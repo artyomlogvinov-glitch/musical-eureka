@@ -87,7 +87,7 @@
 
     - name: Update specific values in the JSON structure
       mysql_connectionString: "Server=localhost;Database=social_trading_{{ unique_id }};User={{ mysql_user }};Password={{ mysql_password }}"
-      all_url_social: "http://{{ url_social }};https://{{ url_social }}""
+      all_url_social: "http://{{ url_social }};https://{{ url_social }}"
       https_url_social: "https://{{ url_social }}"
       all_url_ratings: "http://{{ url_ratings }};https://{{ url_ratings }}"
       https_url_ratings: "https://{{ url_ratings }}"
