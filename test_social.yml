@@ -102,4 +102,4 @@
     - name: Write modified JSON back to file
       ansible.windows.win_copy:
         content: "{{ updated_config | to_nice_json }}"
-        dest: "{{ json_file_path }}"
+        dest: "{{ app_install_dir }}\\API\\appsettings.json"
