@@ -21,6 +21,7 @@
 
     # Variables on Task Start
     # download_link - derect link
+    download_link: "https://brokeree.box.com/shared/static/zyedv8acrrwtysz6g9ziw5qol62vqz6d.zip"
 
     # Variables from Variable Groups:
     # app_path
