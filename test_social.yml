@@ -92,7 +92,7 @@
       ansible.builtin.set_fact:
         current_config: "{{ raw_json.content | b64decode | from_json }}"
 
-    - name: Update specific values in the JSON structure
+    - name: Configuring API/appsettings.json
       ansible.builtin.set_fact:
         updated_config: >- 
          {{
